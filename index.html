@@ -11,34 +11,32 @@
 </head>
 <body>
 
-    <!-- Unified Auth Gateway Container (Matches Screenshot Layout Verbatim) -->
+    <!-- Gateway Authentication Viewport -->
     <div id="auth-gateway-viewport" class="auth-wrapper">
         <div class="bento-card auth-modal">
             <div class="auth-header">
                 <i data-lucide="graduation-cap" class="brand-red-icon"></i>
                 <h2>Education Point 360</h2>
-                <p>Enterprise Learning Management & Communication Network</p>
+                <p>Premium Learning Management & Resource Network</p>
             </div>
             
             <div class="auth-tab-switchers">
                 <button id="tab-trigger-login" class="tab-btn active">Sign In</button>
-                <button id="tab-trigger-register" class="tab-btn">Create Workspace</button>
+                <button id="tab-trigger-register" class="tab-btn">Register</button>
             </div>
 
-            <!-- Login Form Layer -->
             <form id="form-execution-login" class="auth-form-block active">
                 <div class="input-group">
                     <label>EMAIL ADDRESS</label>
                     <input type="email" id="login-email" class="input-field" required placeholder="mrizwank584@gmail.com">
                 </div>
                 <div class="input-group">
-                    <label>CHOOSE PASSWORD</label>
+                    <label>PASSWORD</label>
                     <input type="password" id="login-password" class="input-field" required placeholder="••••••">
                 </div>
                 <button type="submit" class="btn-primary full-width">Initialize Session</button>
             </form>
 
-            <!-- Register Form Layer (Restored exactly from front-end layout specs) -->
             <form id="form-execution-register" class="auth-form-block">
                 <div class="input-group">
                     <label>USERNAME</label>
@@ -62,181 +60,138 @@
                     </select>
                 </div>
                 <div class="input-group">
-                    <label>CHOOSE PASSWORD</label>
+                    <label>PASSWORD</label>
                     <input type="password" id="register-password" class="input-field" required placeholder="••••••">
                 </div>
-                <button type="submit" class="btn-primary full-width">Complete Profile Secure Registration</button>
+                <button type="submit" class="btn-primary full-width">Complete Secure Registration</button>
             </form>
         </div>
     </div>
 
-    <!-- Protected Internal Application Engine Layout Matrix -->
+    <!-- Protected Platform Grid Mesh -->
     <div id="protected-application-mesh" style="display: none;">
         <header class="mobile-navigation-intercept-bar">
-            <div class="brand-flex">
-                <i data-lucide="graduation-cap"></i>
-                <span>EduPoint 360</span>
-            </div>
+            <div class="brand-flex"><i data-lucide="graduation-cap"></i><span>EduPoint 360</span></div>
             <button id="sidebar-mobile-toggle"><i data-lucide="menu"></i></button>
         </header>
 
         <div class="workspace-grid-container">
-            <!-- Sidebar Panel Frame -->
+            <!-- Sidebar Navigation -->
             <aside id="app-sidebar-frame" class="premium-sidebar">
                 <div class="sidebar-top-cluster">
-                    <div class="brand-flex hidden-on-mobile">
-                        <i data-lucide="graduation-cap"></i>
-                        <span>EduPoint 360</span>
-                    </div>
+                    <div class="brand-flex hidden-on-mobile"><i data-lucide="graduation-cap"></i><span>EduPoint 360</span></div>
                     <ul class="navigation-link-list">
-                        <li class="nav-link-item active" data-target="dashboard-view"><a href="#"><i data-lucide="layout-dashboard"></i>Dashboard Matrix</a></li>
-                        <li class="nav-link-item" data-target="whatsapp-view"><a href="#"><i data-lucide="message-square"></i>WhatsApp Sync</a></li>
+                        <li class="nav-link-item active" data-target="dashboard-view"><a href="#"><i data-lucide="layout-dashboard"></i>LMS Dashboard</a></li>
+                        <li class="nav-link-item" data-target="resources-view"><a href="#"><i data-lucide="book-open"></i>Study Resources</a></li>
                         <li class="nav-link-item" data-target="chatgpt-view"><a href="#"><i data-lucide="cpu"></i>ChatGPT Core AI</a></li>
-                        <li class="nav-link-item" data-target="admin-view" id="admin-nav-link" style="display: none;"><a href="#"><i data-lucide="shield-alert"></i>Admin Terminal</a></li>
+                        <li class="nav-link-item" data-target="contact-rizwan-view"><a href="#"><i data-lucide="help-circle"></i>Help Desk (Rizwan)</a></li>
+                        <li class="nav-link-item" data-target="admin-view" id="admin-nav-link" style="display: none;"><a href="#"><i data-lucide="shield-alert"></i>Admin Panel</a></li>
                     </ul>
                 </div>
-                
-                <!-- Peer User Identity Profile Footer Card -->
-                <div class="sidebar-footer-profile-card" id="user-identity-card-target">
-                    <!-- Injected dynamically by logic -->
-                </div>
+                <div class="sidebar-footer-profile-card" id="user-identity-card-target"></div>
             </aside>
 
-            <!-- Main Stage Viewport Frame Matrix -->
-            <main class="main-content-viewport" id="viewport-stage-injector">
+            <!-- Main Stage Content -->
+            <main class="main-content-viewport">
                 
-                <!-- VIEW 1: LMS TERMINAL METRICS (DASHBOARD) -->
+                <!-- VIEW 1: LMS DASHBOARD & ACADEMIC NEWS -->
                 <section id="dashboard-view" class="view-panel active">
                     <div class="bento-header-banner">
-                        <h2 id="welcome-username-string">Welcome back, Student</h2>
+                        <h2 id="welcome-username-string">Welcome back...</h2>
                         <p id="welcome-class-string">Stream Class Allocation: Active</p>
                     </div>
-                    <div class="bento-grid">
-                        <div class="bento-card interactive-hover">
-                            <h3>Gamified Profile Status</h3>
-                            <h1 class="xl-metric-display" id="user-xp-display-value">0 <span class="metric-subtext">XP Points</span></h1>
-                            <div class="badge" id="user-rank-display-value">Rank: Student Tier</div>
-                        </div>
-                        <div class="bento-card continuous-glow">
-                            <h3>System Core Node</h3>
-                            <p class="card-p-text">Supabase DB, RLS Protection Profiles, Real-time PostgreSQL trigger hooks, and chat matrix pipes are currently synced with 0% packet drop parameters.</p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- VIEW 2: COMPLETE REAL-TIME WHATSAPP DISPATCH NETWORK -->
-                <section id="whatsapp-view" class="view-panel">
-                    <div class="whatsapp-app-frame">
-                        <!-- Left Panel: Chat List Engine -->
-                        <div class="wa-sidebar">
-                            <div class="wa-my-profile-header">
-                                <div class="wa-avatar" id="wa-my-avatar-target">U</div>
-                                <div class="wa-header-actions">
-                                    <i data-lucide="message-circle"></i>
-                                    <i data-lucide="more-vertical"></i>
-                                </div>
-                            </div>
-                            <!-- Target Routing User ID Search bar -->
-                            <div class="wa-search-container">
-                                <div class="search-box-wrapper">
-                                    <i data-lucide="search"></i>
-                                    <input type="text" id="wa-peer-search-input" placeholder="Search or start chat by User ID...">
-                                </div>
-                                <button class="btn-action-small" id="btn-initiate-peer-chat" title="Start Chatting"><i data-lucide="plus"></i></button>
-                            </div>
-                            <!-- Active Conversations Thread Pipeline -->
-                            <div class="wa-conversations-list-scroller" id="wa-threads-target">
-                                <div class="wa-thread-row active" data-room="global-room">
-                                    <div class="wa-avatar room-avatar">G</div>
-                                    <div class="wa-thread-meta">
-                                        <h4>Global Class Lounge</h4>
-                                        <p>Real-time server active...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Panel: Chat Thread Window Workspace -->
-                        <div class="wa-chat-workspace">
-                            <div class="wa-chat-header">
-                                <div class="wa-avatar" id="wa-active-chat-avatar-icon">G</div>
-                                <div class="wa-chat-header-title">
-                                    <h4 id="wa-active-chat-title-string">Global Class Lounge</h4>
-                                    <p id="wa-active-chat-status-string">Public Encryption Sync Channel</p>
-                                </div>
-                            </div>
-                            
-                            <!-- WhatsApp Simulated Wallpaper Message Terminal Scrollbox -->
-                            <div class="wa-chat-message-scroller" id="wa-messages-viewport-scroller">
-                                <div class="wa-bubble incoming">
-                                    <span class="sender-title-tag">System Layer</span>
-                                    <p>Welcome to Education Point Real-Time Chat System Network. Type a message or search an ID to begin individual workspace routing.</p>
-                                    <span class="wa-time">7:16 AM</span>
-                                </div>
-                            </div>
-
-                            <!-- WhatsApp Input Tray Footer System -->
-                            <div class="wa-input-tray-footer">
-                                <i data-lucide="smiley" class="wa-icon-btn"></i>
-                                <i data-lucide="paperclip" class="wa-icon-btn"></i>
-                                <input type="text" id="wa-chat-input-field" placeholder="Type a message">
-                                <button id="btn-wa-send-message" class="wa-send-btn-circle"><i data-lucide="send"></i></button>
-                            </div>
+                    
+                    <h3 class="section-title">Latest Educational News & Notifications</h3>
+                    <div class="bento-grid" id="news-matrix-container">
+                        <!-- Dynamic News Cards Injected Here -->
+                        <div class="bento-card educational-news-card continuous-glow">
+                            <span class="badge red-badge">BISE Update</span>
+                            <h4>Board Exam Schedules Announcement</h4>
+                            <p>All Punjab boards pairing schemes and dynamic schedules for final term sessions have been optimized inside the resource block.</p>
                         </div>
                     </div>
                 </section>
 
-                <!-- VIEW 3: CHATGPT MULTIMODAL ADVANCED AI AGENT TERMINAL -->
+                <!-- VIEW 2: STUDY RESOURCES (GUESS PAPERS, SCHEMES, NOTES) -->
+                <section id="resources-view" class="view-panel">
+                    <div class="bento-header-banner">
+                        <h2>Education Point Resource Vault</h2>
+                        <p>Access high-yield Guess Papers, Pairing Schemes, and Core Solutions instantly.</p>
+                    </div>
+
+                    <div class="resource-filter-bar">
+                        <button class="filter-btn active" data-filter="all">All Materials</button>
+                        <button class="filter-btn" data-filter="guess">Guess Papers</button>
+                        <button class="filter-btn" data-filter="scheme">Pairing Schemes</button>
+                        <button class="filter-btn" data-filter="notes">Study Notes</button>
+                    </div>
+
+                    <div class="bento-grid" id="resources-grid-injector" style="margin-top: 20px;">
+                        <!-- Injected via JavaScript dynamically -->
+                    </div>
+                </section>
+
+                <!-- VIEW 3: CHATGPT MULTIMODAL ADVANCED AI AGENT -->
                 <section id="chatgpt-view" class="view-panel">
                     <div class="ai-workspace-wrapper">
                         <div class="ai-terminal-stream-history" id="ai-chat-scroller-node">
                             <div class="ai-bubble assistant">
                                 <i data-lucide="bot" class="ai-icon-avatar"></i>
                                 <div class="ai-message-body">
-                                    <p>Greetings. I am your integrated ChatGPT-class processing engine. I am engineered to respond to comprehensive engineering, academic text, image data streams, documents, and mock acoustic voice signal inputs natively. Process any parameter instantly.</p>
+                                    <p>Greetings. I am your enhanced ChatGPT engine. Send texts, attach files/images, or record audio streams directly for fast analytical computations.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Dynamic Real-time Mock Processing Previews Panel Layout -->
                         <div id="ai-runtime-attachment-preview-bar" class="ai-preview-tray" style="display: none;">
                             <div class="preview-meta-flex">
                                 <i data-lucide="file-text" id="ai-preview-icon-indicator"></i>
-                                <span id="ai-preview-filename-string">document_payload.pdf</span>
+                                <span id="ai-preview-filename-string">payload.pdf</span>
                             </div>
                             <button id="btn-strip-attached-payload" class="clear-btn">✕</button>
                         </div>
 
-                        <!-- Dynamic Multi-media Inputs Bar Component Matrix -->
                         <div class="ai-input-console-footer">
                             <input type="file" id="ai-native-system-file-input" style="display: none;" accept="image/*,application/pdf,text/plain">
-                            
                             <div class="console-action-buttons-group">
-                                <button id="btn-trigger-doc-upload" class="console-icon-btn" title="Upload Document / Picture"><i data-lucide="paperclip"></i></button>
-                                <button id="btn-trigger-voice-mic" class="console-icon-btn" title="Record Voice Assistant Input"><i data-lucide="mic"></i></button>
+                                <button id="btn-trigger-doc-upload" class="console-icon-btn"><i data-lucide="paperclip"></i></button>
+                                <button id="btn-trigger-voice-mic" class="console-icon-btn"><i data-lucide="mic"></i></button>
                             </div>
-
-                            <input type="text" id="ai-terminal-input-prompt" class="input-field console-text-input" placeholder="Ask ChatGPT anything or use media attachments...">
+                            <input type="text" id="ai-terminal-input-prompt" class="input-field console-text-input" placeholder="Ask ChatGPT anything...">
                             <button id="btn-dispatch-ai-computation" class="btn-primary console-send-btn">Compute AI</button>
                         </div>
                     </div>
                 </section>
 
-                <!-- VIEW 4: ADMIN CONTROLLER PLATFORM TERMINAL -->
-                <section id="admin-view" class="view-panel">
-                    <div class="bento-header-banner" style="background: linear-gradient(135deg, #1d1d1f, #e30613); color: white;">
-                        <h2>Root Administration Terminal</h2>
-                        <p>Real-time Global Ecosystem Parameter Controls</p>
+                <!-- VIEW 4: DIRECT DESK TO MUHAMMAD RIZWAN -->
+                <section id="contact-rizwan-view" class="view-panel">
+                    <div class="bento-header-banner" style="background: linear-gradient(135deg, #fff, rgba(227,6,19,0.05));">
+                        <h2>Direct Support Platform</h2>
+                        <p>Submit your system query or issue below. It will be delivered directly to <strong>Muhammad Rizwan</strong> in real-time.</p>
                     </div>
-                    <div class="bento-grid" style="margin-top:20px;">
-                        <div class="bento-card">
-                            <h3>Total Network Users</h3>
-                            <h1 class="xl-metric-display" style="color:var(--text-dark)" id="admin-total-users-metric">1</h1>
-                            <p class="card-p-text">Across all registered institutional tiers.</p>
+
+                    <div class="bento-card" style="max-width:600px; margin: 20px auto;">
+                        <div class="input-group" style="margin-bottom: 15px;">
+                            <label>YOUR INSTANT QUERY / COMPLAINT</label>
+                            <textarea id="support-query-textarea" rows="5" class="input-field" placeholder="Type what you want to ask Muhammad Rizwan..."></textarea>
                         </div>
+                        <button id="btn-submit-support-query" class="btn-primary full-width">Send Directly to Rizwan</button>
+                    </div>
+                </section>
+
+                <!-- VIEW 5: ADMIN AUDIT LOG TERMINAL -->
+                <section id="admin-view" class="view-panel">
+                    <div class="bento-header-banner" style="background: #1d1d1f; color: white;">
+                        <h2>Ecosystem Management Dashboard</h2>
+                        <p>Logged-in as Admin Module Controller</p>
+                    </div>
+                    <div class="bento-grid" style="margin-top: 20px;">
                         <div class="bento-card">
-                            <h3>LMS System Variables</h3>
-                            <button class="btn-primary" style="margin-top:15px; width:100%;" id="btn-admin-purge-cache">Purge System Audit Logs</button>
+                            <h3>Real-Time Support Inbox</h3>
+                            <div id="admin-inbox-queries-target" style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">
+                                <!-- Dynamic Submissions load here for Rizwan to monitor -->
+                                <p style="color:var(--text-muted)">No active pending ticket arrays found.</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -245,7 +200,6 @@
         </div>
     </div>
 
-    <!-- Inject System Execution Script Architecture Link -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
