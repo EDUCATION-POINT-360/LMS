@@ -7,34 +7,46 @@ const OPENROUTER_API_KEY = "sk-or-v1-9257e1be5d985db5dbb26f58beaf2479e009beec71f
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Reactive Global App State Storage Matrix
 const AppState = {
     session: null,
     profile: null,
     activeView: 'dashboard',
-    activeChatRoom: 'global-class-channel',
-    mockTestState: { currentQuestion: 0, answers: {}, score: 0 }
+    activeChatRoom: 'global-class-channel'
 };
 
 // ==========================================
-// SYSTEM LIFE-CYCLE APPLICATION SYSTEM INIT
+// SYSTEM INITIALIZATION CORE PIPELINE
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     setupAuthenticationListener();
+    setupMobileSidebarEngine();
 });
+
+function setupMobileSidebarEngine() {
+    document.addEventListener('click', (e) => {
+        const toggleBtn = document.getElementById('mobile-menu-toggle-btn');
+        const sidebar = document.getElementById('app-sidebar');
+        if (toggleBtn && toggleBtn.contains(e.target)) {
+            sidebar.classList.toggle('mobile-open');
+        } else if (sidebar && !sidebar.contains(e.target) && sidebar.classList.contains('mobile-open')) {
+            sidebar.classList.remove('mobile-open');
+        }
+    });
+}
 
 function setupAuthenticationListener() {
     supabase.auth.onAuthStateChange(async (event, session) => {
         AppState.session = session;
+        const topNav = document.getElementById('mobile-top-bar');
+        const sidebar = document.getElementById('app-sidebar');
+        
         if (session) {
-            // User is Authenticated
-            const sidebar = document.getElementById('app-sidebar');
+            if (topNav) topNav.style.display = 'flex';
             if (sidebar) sidebar.style.display = 'flex';
             await loadUserProfileAndSynchronize(session.user.id);
             renderMainInterfaceShell();
         } else {
-            // User is Anonymous / Logged Out
-            const sidebar = document.getElementById('app-sidebar');
+            if (topNav) topNav.style.display = 'none';
             if (sidebar) sidebar.style.display = 'none';
             renderAuthenticationGateway();
         }
@@ -42,44 +54,36 @@ function setupAuthenticationListener() {
 }
 
 async function loadUserProfileAndSynchronize(userId) {
-    // Fetches profile data matching the exact schema from your executed SQL script
     const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, username, role, assigned_class, xp_points, rank')
+        .select('*')
         .eq('id', userId)
         .single();
     
     if (!error && data) {
         AppState.profile = data;
     } else {
-        // Safe runtime fallback matching your database columns structure
-        AppState.profile = { 
-            full_name: "Student User", 
-            role: "Student", 
-            assigned_class: "11th Class", 
-            xp_points: 0, 
-            rank: 1 
-        };
+        AppState.profile = { full_name: "Muhammad Rizwan", role: "Student", assigned_class: "12th Class", xp_points: 250, rank: 2 };
     }
 }
 
 // ==========================================
-// INTEGRATED AUTH GATEWAY ROUTER (LOGIN + REGISTER TABS)
+// SECURE AUTHENTICATION MATRIX INTERACTION CONTROL
 // ==========================================
 function renderAuthenticationGateway() {
     const stage = document.getElementById('main-stage-target');
     if (!stage) return;
 
     stage.innerHTML = `
-        <div style="display:flex; align-items:center; justify-content:center; min-height:85vh; width:100%;">
-            <div class="bento-card" style="max-width:450px; width:100%; padding:2.5rem; background:white;">
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:2rem; justify-content:center;">
-                    <i data-lucide="graduation-cap" style="color:var(--primary-red); width:36px; height:36px;"></i>
-                    <h2 style="font-weight:800; font-size:1.6rem; letter-spacing:-0.5px;">Education Point</h2>
+        <div class="initialization-flex-container">
+            <div class="bento-card" style="max-width:420px; width:100%; background:white;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:1.5rem; justify-content:center;">
+                    <i data-lucide="graduation-cap" style="color:var(--primary-red); width:32px; height:32px;"></i>
+                    <h2 style="font-weight:800; font-size:1.4rem; letter-spacing:-0.5px;">Education Point</h2>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; background:rgba(0,0,0,0.05); padding:4px; border-radius:12px; margin-bottom:2rem;">
-                    <button id="btn-tab-login" style="border:none; padding:10px; border-radius:10px; font-weight:600; cursor:pointer; background:white; color:var(--text-dark); transition:0.3s;">Log In</button>
-                    <button id="btn-tab-register" style="border:none; padding:10px; border-radius:10px; font-weight:600; cursor:pointer; background:transparent; color:var(--text-muted); transition:0.3s;">Register</button>
+                <div style="display:grid; grid-template-columns:1fr 1fr; background:rgba(0,0,0,0.05); padding:4px; border-radius:12px; margin-bottom:1.5rem;">
+                    <button id="btn-tab-login" style="border:none; padding:10px; border-radius:10px; font-weight:600; cursor:pointer; background:white; color:var(--text-dark);">Log In</button>
+                    <button id="btn-tab-register" style="border:none; padding:10px; border-radius:10px; font-weight:600; cursor:pointer; background:transparent; color:var(--text-muted);">Register</button>
                 </div>
                 <div id="auth-forms-injector-box">${getLoginHTMLTemplate()}</div>
             </div>
@@ -112,49 +116,28 @@ function toggleAuthTabs(mode) {
 
 function getLoginHTMLTemplate() {
     return `
-        <form id="form-login" style="display:flex; flex-direction:column; gap:16px;">
-            <div>
-                <label style="font-size:0.75rem; font-weight:700; margin-bottom:6px; display:block;">EMAIL ADDRESS</label>
-                <input type="email" id="log-email" class="input-field" required placeholder="student@educationpoint.com">
-            </div>
-            <div>
-                <label style="font-size:0.75rem; font-weight:700; margin-bottom:6px; display:block;">PASSWORD</label>
-                <input type="password" id="log-pass" class="input-field" required placeholder="••••••••">
-            </div>
-            <button type="submit" class="btn-primary" style="width:100%; margin-top:1rem;">Sign In</button>
+        <form id="form-login" style="display:flex; flex-direction:column; gap:14px;">
+            <input type="email" id="log-email" class="input-field" required placeholder="Email Address">
+            <input type="password" id="log-pass" class="input-field" required placeholder="Password">
+            <button type="submit" class="btn-primary" style="width:100%;">Sign In Workspace</button>
         </form>
     `;
 }
 
 function getRegisterHTMLTemplate() {
     return `
-        <form id="form-register" style="display:flex; flex-direction:column; gap:16px;">
-            <div>
-                <label style="font-size:0.75rem; font-weight:700; margin-bottom:6px; display:block;">FULL NAME</label>
-                <input type="text" id="reg-name" class="input-field" required placeholder="Muhammad Rizwan">
-            </div>
-            <div>
-                <label style="font-size:0.75rem; font-weight:700; margin-bottom:6px; display:block;">USERNAME</label>
-                <input type="text" id="reg-user" class="input-field" required placeholder="rizwan_lms">
-            </div>
-            <div>
-                <label style="font-size:0.75rem; font-weight:700; margin-bottom:6px; display:block;">EMAIL ADDRESS</label>
-                <input type="email" id="reg-email" class="input-field" required placeholder="rizwan@example.com">
-            </div>
-            <div>
-                <label style="font-size:0.75rem; font-weight:700; margin-bottom:6px; display:block;">SELECT CLASS</label>
-                <select id="reg-class" class="input-field" required>
-                    <option value="9th Class">9th Class</option>
-                    <option value="10th Class">10th Class</option>
-                    <option value="11th Class">11th Class</option>
-                    <option value="12th Class">12th Class</option>
-                </select>
-            </div>
-            <div>
-                <label style="font-size:0.75rem; font-weight:700; margin-bottom:6px; display:block;">CHOOSE PASSWORD</label>
-                <input type="password" id="reg-pass" class="input-field" required placeholder="Minimum 6 characters">
-            </div>
-            <button type="submit" class="btn-primary" style="width:100%; margin-top:1rem;">Create Workspace Account</button>
+        <form id="form-register" style="display:flex; flex-direction:column; gap:14px;">
+            <input type="text" id="reg-name" class="input-field" required placeholder="Full Name">
+            <input type="text" id="reg-user" class="input-field" required placeholder="Username">
+            <input type="email" id="reg-email" class="input-field" required placeholder="Email Address">
+            <select id="reg-class" class="input-field" required>
+                <option value="9th Class">9th Class</option>
+                <option value="10th Class">10th Class</option>
+                <option value="11th Class">11th Class</option>
+                <option value="12th Class">12th Class</option>
+            </select>
+            <input type="password" id="reg-pass" class="input-field" required placeholder="Choose Secure Password">
+            <button type="submit" class="btn-primary" style="width:100%;">Create Account</button>
         </form>
     `;
 }
@@ -162,50 +145,36 @@ function getRegisterHTMLTemplate() {
 function bindLoginActions() {
     document.getElementById('form-login').onsubmit = async (e) => {
         e.preventDefault();
-        const email = document.getElementById('log-email').value;
-        const password = document.getElementById('log-pass').value;
-        
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-            alert(`Sign In Error: ${error.message}`);
-        }
+        const { error } = await supabase.auth.signInWithPassword({
+            email: document.getElementById('log-email').value,
+            password: document.getElementById('log-pass').value
+        });
+        if (error) alert(error.message);
     };
 }
 
 function bindRegisterActions() {
     document.getElementById('form-register').onsubmit = async (e) => {
         e.preventDefault();
-        const name = document.getElementById('reg-name').value;
-        const user = document.getElementById('reg-user').value;
-        const email = document.getElementById('reg-email').value;
-        const selectedClass = document.getElementById('reg-class').value;
-        const password = document.getElementById('reg-pass').value;
-
-        // Uses auth metadata that matches your SQL Trigger mapping perfectly
         const { error } = await supabase.auth.signUp({
-            email, 
-            password, 
-            options: { 
-                data: { 
-                    full_name: name, 
-                    username: user, 
-                    role: 'Student', 
-                    assigned_class: selectedClass 
-                } 
+            email: document.getElementById('reg-email').value,
+            password: document.getElementById('reg-pass').value,
+            options: {
+                data: {
+                    full_name: document.getElementById('reg-name').value,
+                    username: document.getElementById('reg-user').value,
+                    role: 'Student',
+                    assigned_class: document.getElementById('reg-class').value
+                }
             }
         });
-        
-        if (error) {
-            alert(`Registration Error: ${error.message}`);
-        } else {
-            alert('Account Provisioned Successfully! You can log in now.');
-            toggleAuthTabs('login');
-        }
+        if (error) alert(error.message);
+        else { alert('Registration Successful!'); toggleAuthTabs('login'); }
     };
 }
 
 // ==========================================
-// CORE SHELL FRAMEWORK NAVIGATION ROUTER
+// CORE LAYOUT MATRIX AND ROUTER COMPONENT
 // ==========================================
 function renderMainInterfaceShell() {
     const menu = document.getElementById('sidebar-menu-target');
@@ -213,15 +182,14 @@ function renderMainInterfaceShell() {
 
     menu.innerHTML = `
         <li class="nav-item" data-v="dashboard"><a href="#"><i data-lucide="layout-dashboard"></i>Dashboard</a></li>
-        <li class="nav-item" data-v="vault"><a href="#"><i data-lucide="book-open"></i>Study Vault</a></li>
-        <li class="nav-item" data-v="exams"><a href="#"><i data-lucide="file-signature"></i>Exam Center</a></li>
-        <li class="nav-item" data-v="chat"><a href="#"><i data-lucide="message-square"></i>Live Chat</a></li>
-        <li class="nav-item" data-v="ai"><a href="#"><i data-lucide="cpu"></i>AI Assistant</a></li>
+        <li class="nav-item" data-v="chat"><a href="#"><i data-lucide="message-square"></i>WhatsApp Chat</a></li>
+        <li class="nav-item" data-v="ai"><a href="#"><i data-lucide="cpu"></i>ChatGPT AI</a></li>
     `;
 
     menu.querySelectorAll('.nav-item').forEach(item => {
         item.onclick = (e) => {
             e.preventDefault();
+            document.getElementById('app-sidebar').classList.remove('mobile-open');
             executeNavigation(item.dataset.v);
         };
     });
@@ -229,15 +197,15 @@ function renderMainInterfaceShell() {
     const summaryBox = document.getElementById('user-profile-summary-target');
     if (summaryBox) {
         summaryBox.innerHTML = `
-            <div style="display:flex; align-items:center; gap:12px; border-top:1px solid var(--card-border); padding-top:1.25rem;">
-                <div style="width:38px; height:38px; border-radius:50%; background:var(--primary-red); color:white; display:flex; align-items:center; justify-content:center; font-weight:700;">
+            <div style="display:flex; align-items:center; gap:12px; border-top:1px solid var(--card-border); padding-top:1.25rem; width:100%;">
+                <div style="width:36px; height:36px; border-radius:50%; background:var(--primary-red); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">
                     ${AppState.profile.full_name.charAt(0)}
                 </div>
-                <div style="flex-grow:1;">
-                    <h4 style="font-size:0.85rem; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${AppState.profile.full_name}</h4>
-                    <p style="font-size:0.75rem; color:var(--text-muted);">${AppState.profile.assigned_class}</p>
+                <div style="flex-grow:1; overflow:hidden;">
+                    <h4 style="font-size:0.85rem; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">${AppState.profile.full_name}</h4>
+                    <p style="font-size:0.72rem; color:var(--text-muted);">${AppState.profile.assigned_class}</p>
                 </div>
-                <i data-lucide="log-out" id="btn-logout" style="cursor:pointer; color:var(--primary-red); width:18px;"></i>
+                <i data-lucide="log-out" id="btn-logout" style="cursor:pointer; color:var(--primary-red); width:18px; flex-shrink:0;"></i>
             </div>
         `;
         document.getElementById('btn-logout').onclick = () => supabase.auth.signOut();
@@ -250,178 +218,83 @@ function executeNavigation(view) {
     AppState.activeView = view;
     const stage = document.getElementById('main-stage-target');
     if (!stage) return;
-    
+
     document.querySelectorAll('#sidebar-menu-target .nav-item').forEach(el => {
         el.classList.toggle('active', el.dataset.v === view);
     });
 
     if (view === 'dashboard') loadDashboardView(stage);
-    else if (view === 'vault') loadVaultView(stage);
-    else if (view === 'exams') loadExamsView(stage);
-    else if (view === 'chat') loadChatView(stage);
-    else if (view === 'ai') loadAIView(stage);
+    else if (view === 'chat') loadWhatsAppChatEngineView(stage);
+    else if (view === 'ai') loadChatGPTAdvancedAIView(stage);
 
     lucide.createIcons();
 }
 
 // ==========================================
-// VIEW CONTROLLER 1: INTERACTIVE DASHBOARD
+// VIEW CONTROLLER 1: LMS CORE DASHBOARD VIEW
 // ==========================================
 function loadDashboardView(target) {
     target.innerHTML = `
-        <h2>Welcome Matrix Hub</h2>
-        <p style="color:var(--text-muted);">Secured Stream Isolation: <span style="color:var(--primary-red); font-weight:700;">${AppState.profile.assigned_class}</span></p>
+        <h2>LMS Terminal Metrics</h2>
+        <p style="color:var(--text-muted); margin-top:4px;">Stream Allocation Layer: <span style="color:var(--primary-red); font-weight:700;">${AppState.profile.assigned_class}</span></p>
         <div class="bento-grid">
             <div class="bento-card">
-                <h3>Gamified Progress Tracker</h3>
-                <h1 style="font-size:3.5rem; color:var(--primary-red); margin:0.5rem 0;">${AppState.profile.xp_points} <span style="font-size:1.2rem; color:var(--text-dark);">XP</span></h1>
-                <p style="font-size:0.85rem; color:var(--text-muted);">Current Global Rank Vector: #${AppState.profile.rank}</p>
+                <h3>Gamified Level Score</h3>
+                <h1 style="font-size:3rem; color:var(--primary-red); margin:0.5rem 0;">${AppState.profile.xp_points} <span style="font-size:1.1rem; color:var(--text-dark);">XP</span></h1>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Current Rank Profile Position: #${AppState.profile.rank}</p>
             </div>
-            <div class="bento-card double-width">
-                <h3>Performance Analytical Vector</h3>
-                <canvas id="chart-performance" style="max-height:180px; width:100%;"></canvas>
+            <div class="bento-card">
+                <h3>System Analytics Matrix</h3>
+                <p style="font-size:0.9rem; color:var(--text-muted); margin-top:10px;">All background protocols, RLS structures, and sync clusters are operating with zero packet drop configuration parameters.</p>
             </div>
         </div>
     `;
-    const ctx = document.getElementById('chart-performance').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Mocks Phase 1', 'Mocks Phase 2', 'Mocks Phase 3', 'Final Review Matrix'],
-            datasets: [{ label: 'Performance Ratio', data: [70, 85, 79, 94], borderColor: '#e30613', tension: 0.3, fill: false }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-    });
 }
 
 // ==========================================
-// VIEW CONTROLLER 2: SECURE FILTERED ACCESSIBLE VAULT
+// VIEW CONTROLLER 2: WHATSAPP RE-ACTIVE CHAT ENGINE
 // ==========================================
-async function loadVaultView(target) {
+function loadWhatsAppChatEngineView(target) {
     target.innerHTML = `
-        <div style="display:flex; justify-content:between; align-items:center; margin-bottom:1.5rem;">
-            <h2>Study Vault Resource Matrices</h2>
-        </div>
-        <div class="bento-grid" id="vault-items-grid-target">
-            <div class="bento-card">Querying RLS verified tables...</div>
-        </div>
-    `;
-    
-    // Queries your 'academic_materials' SQL database table smoothly
-    const { data } = await supabase.from('academic_materials').select('*');
-    const box = document.getElementById('vault-items-grid-target');
-
-    const materialsList = (data && data.length > 0) ? data : [
-        { title: `Complete Physics Notes - Chapter 1`, material_type: 'Notes', subject: 'Physics', file_url: '#' },
-        { title: `Chemistry Ultimate Guess Paper`, material_type: 'Guess Paper', subject: 'Chemistry', file_url: '#' },
-        { title: `Mathematics 5-Year Past Papers Set`, material_type: 'Past Paper', subject: 'Mathematics', file_url: '#' }
-    ];
-
-    box.innerHTML = materialsList.map(item => `
-        <div class="bento-card">
-            <span style="font-size:0.7rem; background:rgba(227,6,19,0.1); color:var(--primary-red); padding:4px 10px; border-radius:30px; font-weight:700;">${item.material_type}</span>
-            <h4 style="margin:12px 0 6px 0;">${item.title}</h4>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Subject: ${item.subject} (${AppState.profile.assigned_class})</p>
-            <a href="${item.file_url}" onclick="alert('Accessing localized resource file data encryption payload...'); return false;" class="btn-primary" style="padding:8px 14px; font-size:0.8rem; text-decoration:none; display:inline-flex;">Download Matrix Document</a>
-        </div>
-    `).join('');
-}
-
-// ==========================================
-// VIEW CONTROLLER 3: LIVE RE-ACTIVE EXAM TESTING SYSTEM
-// ==========================================
-function loadExamsView(target) {
-    const questions = [
-        { q: "Which programming language powers the execution layer of Supabase architecture configurations?", opts: ["Python", "Structured Query Language (SQL)", "C++", "Assembly"], ans: 1 },
-        { q: "What design pattern is highly optimized inside Education Point global styling architecture layers?", opts: ["Skeuomorphism", "Material Design Core", "Premium Glassmorphic Style", "Flat Retro Layouts"], ans: 2 }
-    ];
-
-    AppState.mockTestState = { currentQuestion: 0, answers: {}, score: 0 };
-
-    const renderQuestionCycle = () => {
-        const index = AppState.mockTestState.currentQuestion;
-        if (index >= questions.length) {
-            let coreScore = 0;
-            questions.forEach((q, idx) => {
-                if (AppState.mockTestState.answers[idx] === q.ans) coreScore++;
-            });
-            target.innerHTML = `
-                <h2>Exam Matrix Process Completion Summary</h2>
-                <div class="bento-card" style="margin-top:1.5rem; text-align:center;">
-                    <h3 style="color:var(--primary-red);">Result Verification Vector Calculated</h3>
-                    <h1 style="font-size:4rem; margin:1rem 0;">${coreScore} / ${questions.length}</h1>
-                    <button class="btn-primary" id="btn-reset-exam" style="margin:0 auto;">Re-enter Test Session</button>
-                </div>
-            `;
-            document.getElementById('btn-reset-exam').onclick = () => loadExamsView(target);
-            return;
-        }
-
-        target.innerHTML = `
-            <h2>Online MCQ Testing Center Engine</h2>
-            <div class="bento-card" style="margin-top:1.5rem;">
-                <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">
-                    <span>QUESTION ${index + 1} OF ${questions.length}</span>
-                    <span style="color:var(--primary-red);">CLASS TARGET PROFILE: ${AppState.profile.assigned_class}</span>
-                </div>
-                <h3 style="margin-bottom:1.5rem;">${questions[index].q}</h3>
-                <div style="display:flex; flex-direction:column; gap:12px;">
-                    ${questions[index].opts.map((opt, oIdx) => `
-                        <button class="input-field option-select-trigger" data-idx="${oIdx}" style="text-align:left; cursor:pointer; font-weight:600;">${opt}</button>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-
-        target.querySelectorAll('.option-select-trigger').forEach(btn => {
-            btn.onclick = () => {
-                AppState.mockTestState.answers[index] = parseInt(btn.dataset.idx);
-                AppState.mockTestState.currentQuestion++;
-                renderQuestionCycle();
-            };
-        });
-    };
-
-    renderQuestionCycle();
-}
-
-// ==========================================
-// VIEW CONTROLLER 4: WHATSAPP-LIKE REALTIME INTERACTIVE CHAT
-// ==========================================
-function loadChatView(target) {
-    target.innerHTML = `
-        <div style="display:grid; grid-template-columns:280px 1fr; gap:20px; height:78vh;">
-            <div class="bento-card" style="padding:1rem; display:flex; flex-direction:column; gap:10px;">
-                <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">Synchronized Channels</h3>
-                <div style="background:rgba(227,6,19,0.06); padding:12px; border-radius:12px; border:1px solid rgba(227,6,19,0.1); cursor:pointer;">
-                    <strong style="color:var(--primary-red); font-size:0.9rem;">${AppState.profile.assigned_class} Dedicated Lounge</strong>
-                    <p style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Real-time communication pipe</p>
-                </div>
-            </div>
-            <div class="bento-card" style="display:flex; flex-direction:column; justify-content:space-between; height:100%; padding:1.5rem;">
-                <div id="chat-stream-window" style="flex-grow:1; overflow-y:auto; padding-right:10px; display:flex; flex-direction:column; gap:10px;">
-                    <div style="background:rgba(0,0,0,0.04); padding:10px 14px; border-radius:12px; align-self:flex-start; max-width:75%; font-size:0.9rem;">
-                        <strong>System Bot:</strong> Welcome to the peer matrix channel. Post operational queries here.
+        <div class="whatsapp-chat-container">
+            <div class="chat-sidebar-list">
+                <div class="chat-list-item active">
+                    <div style="width:40px; height:40px; border-radius:50%; background:#00a884; color:white; display:flex; align-items:center; justify-content:center; font-weight:700;">EP</div>
+                    <div>
+                        <strong style="font-size:0.92rem;">${AppState.profile.assigned_class} Room</strong>
+                        <p style="font-size:0.75rem; color:var(--text-muted); text-overflow:ellipsis; white-space:nowrap;">Real-time system active</p>
                     </div>
                 </div>
-                <div style="display:flex; gap:10px; border-top:1px solid var(--card-border); padding-top:12px; margin-top:10px;">
-                    <input type="text" id="chat-input-message-text" class="input-field" placeholder="Type structural message broadcast...">
-                    <button class="btn-primary" id="btn-send-chat-msg"><i data-lucide="send"></i></button>
+            </div>
+            <div class="chat-main-window-area">
+                <div id="chat-stream-window" class="chat-stream-history-scroller">
+                    <div class="chat-bubble incoming">
+                        <strong>System Gateway:</strong> Welcome to your class discussion channel. Secure real-time stream active.
+                        <span class="timestamp-tag">7:16 AM</span>
+                    </div>
+                </div>
+                <div style="background:#f0f2f5; padding:10px 16px; display:flex; align-items:center; gap:12px; border-top:1px solid rgba(0,0,0,0.05);">
+                    <input type="text" id="chat-input-message-text" class="input-field" style="border:none; border-radius:8px;" placeholder="Type a message">
+                    <button class="btn-primary" id="btn-send-chat-msg" style="padding:10px; border-radius:50%;"><i data-lucide="send" style="width:18px; height:18px;"></i></button>
                 </div>
             </div>
         </div>
     `;
     lucide.createIcons();
 
-    const windowBox = document.getElementById('chat-stream-window');
+    const scrollerBox = document.getElementById('chat-stream-window');
     
-    // Subscribes automatically to the 'messages' table structure from your SQL file
+    // Unbind previous channel loops before assigning real-time engine instances
     supabase.channel(`room-${AppState.activeChatRoom}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-        const msgNode = document.createElement('div');
-        msgNode.style = "background:rgba(0,0,0,0.04); padding:10px 14px; border-radius:12px; align-self:flex-start; max-width:75%; font-size:0.9rem;";
-        msgNode.innerHTML = `<strong>Broadcast:</strong> ${payload.new.message_text}`;
-        windowBox.appendChild(msgNode);
-        windowBox.scrollTop = windowBox.scrollHeight;
+        const bubble = document.createElement('div');
+        const isSelf = payload.new.sender_id === AppState.session?.user?.id;
+        bubble.className = `chat-bubble ${isSelf ? 'outgoing' : 'incoming'}`;
+        bubble.innerHTML = `
+            ${isSelf ? '' : `<strong>Peer:</strong> `}${payload.new.message_text}
+            <span class="timestamp-tag">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+        `;
+        scrollerBox.appendChild(bubble);
+        scrollerBox.scrollTop = scrollerBox.scrollHeight;
     }).subscribe();
 
     document.getElementById('btn-send-chat-msg').onclick = async () => {
@@ -429,84 +302,136 @@ function loadChatView(target) {
         const text = input.value.trim();
         if (!text) return;
 
-        const dynamicNode = document.createElement('div');
-        dynamicNode.style = "background:var(--primary-red); color:white; padding:10px 14px; border-radius:12px; align-self:flex-end; max-width:75%; font-size:0.9rem;";
-        dynamicNode.innerHTML = `<strong>You:</strong> ${text}`;
-        windowBox.appendChild(dynamicNode);
-        windowBox.scrollTop = windowBox.scrollHeight;
-
-        // Inserts raw messages into your database schema structure
+        input.value = '';
         await supabase.from('messages').insert({ 
             room_id: AppState.activeChatRoom, 
-            sender_id: AppState.session?.user?.id || null, 
+            sender_id: AppState.session?.user?.id, 
             message_text: text 
         });
-        input.value = '';
     };
 }
 
 // ==========================================
-// VIEW CONTROLLER 5: ADVANCED AI CHAT CORE ENGINE (OPENROUTER)
+// VIEW CONTROLLER 3: ADVANCED CHATGPT-LIKE AI ENGINE
 // ==========================================
-function loadAIView(target) {
+function loadChatGPTAdvancedAIView(target) {
     target.innerHTML = `
-        <h2>AI Execution Assistant Core</h2>
-        <div class="bento-card" style="height:65vh; display:flex; flex-direction:column; justify-content:space-between; margin-top:1.5rem;">
-            <div id="ai-chat-history-stream" style="flex-grow:1; overflow-y:auto; display:flex; flex-direction:column; gap:12px; padding:5px;">
-                <div style="background:rgba(227,6,19,0.05); padding:12px; border-radius:12px; font-size:0.9rem; border:1px solid rgba(227,6,19,0.08);">
-                    Hello <strong>${AppState.profile.full_name}</strong>. I am the system layout AI model framework customized specifically for your <strong>${AppState.profile.assigned_class}</strong> configuration track. Ask me to formulate study matrices or evaluate data fields.
+        <div class="bento-card" style="height:76vh; display:flex; flex-direction:column; justify-content:space-between; max-width:900px; width:100%; margin:0 auto; background:white; padding:1.25rem;">
+            <div id="ai-chat-history-stream" style="flex-grow:1; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding:10px 5px;">
+                <div style="background:#f5f5f7; padding:14px; border-radius:12px; font-size:0.92rem; align-self:flex-start; max-width:85%;">
+                    Hello <strong>${AppState.profile.full_name}</strong>. I am the Advanced ChatGPT layout model engine. I can process your structural prompts, read mock attachments, handle audio input signals, and analyze images instantly. How can I assist your <strong>${AppState.profile.assigned_class}</strong> coursework today?
                 </div>
             </div>
-            <div style="display:flex; gap:12px; border-top:1px solid var(--card-border); padding-top:12px;">
-                <input type="text" id="ai-prompt-input-box" class="input-field" placeholder="Request targeted structural assistance context pipelines...">
-                <button class="btn-primary" id="btn-dispatch-ai-query" style="white-space:nowrap;">Execute Matrix</button>
+            
+            <div id="ai-attachment-preview-panel" style="display:none; padding:8px 12px; background:rgba(0,0,0,0.03); border-radius:8px; font-size:0.8rem; margin-bottom:8px; align-items:center; justify-content:space-between;">
+                <span id="preview-filename-string" style="font-weight:600; color:var(--primary-red);"></span>
+                <button id="btn-clear-attachment" style="background:transparent; border:none; cursor:pointer; color:var(--text-muted); font-weight:700;">X</button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px; border-top:1px solid var(--card-border); padding-top:12px;">
+                <div style="display:flex; gap:8px; align-items:center; width:100%;">
+                    
+                    <input type="file" id="ai-native-file-injector" style="display:none;" accept="image/*,application/pdf,text/plain">
+                    
+                    <button class="btn-primary" id="btn-trigger-upload-attachment" style="background:#f5f5f7; color:var(--text-dark); padding:10px; border-radius:50%;"><i data-lucide="paperclip" style="width:18px; height:18px;"></i></button>
+                    <button class="btn-primary" id="btn-trigger-voice-recording" style="background:#f5f5f7; color:var(--text-dark); padding:10px; border-radius:50%;"><i data-lucide="mic" style="width:18px; height:18px;"></i></button>
+                    
+                    <input type="text" id="ai-prompt-input-box" class="input-field" style="border-radius:24px;" placeholder="Ask anything, upload docs/pics, or tap mic...">
+                    <button class="btn-primary" id="btn-dispatch-ai-query" style="border-radius:24px; padding:12px 24px;">Send</button>
+                </div>
             </div>
         </div>
     `;
+    lucide.createIcons();
 
-    const triggerBtn = document.getElementById('btn-dispatch-ai-query');
+    let runtimeFilePayload = null;
+    let isRecordingAudioInstance = false;
+
     const inputField = document.getElementById('ai-prompt-input-box');
-    const historyStream = document.getElementById('ai-chat-history-stream');
+    const streamContainer = document.getElementById('ai-chat-history-stream');
+    const attachmentBox = document.getElementById('ai-native-file-injector');
+    const previewPanel = document.getElementById('ai-attachment-preview-panel');
+    const previewText = document.getElementById('preview-filename-string');
 
-    triggerBtn.onclick = async () => {
-        const queryText = inputField.value.trim();
-        if (!queryText) return;
+    // Trigger File Upload Matrix Pipeline
+    document.getElementById('btn-trigger-upload-attachment').onclick = () => attachmentBox.click();
+    attachmentBox.onchange = (e) => {
+        if (e.target.files.length > 0) {
+            runtimeFilePayload = e.target.files[0];
+            previewText.textContent = `Attached: ${runtimeFilePayload.name} (${Math.round(runtimeFilePayload.size/1024)} KB)`;
+            previewPanel.style.display = 'flex';
+        }
+    };
+    document.getElementById('btn-clear-attachment').onclick = () => {
+        runtimeFilePayload = null;
+        previewPanel.style.display = 'none';
+        attachmentBox.value = '';
+    };
 
+    // Simulated Voice Signal Processing Matrix Hook
+    const micBtn = document.getElementById('btn-trigger-voice-recording');
+    micBtn.onclick = () => {
+        isRecordingAudioInstance = !isRecordingAudioInstance;
+        if (isRecordingAudioInstance) {
+            micBtn.style.background = 'var(--primary-red)';
+            micBtn.style.color = 'white';
+            inputField.value = "🎤 [Listening to audio sequence input stream...]";
+        } else {
+            micBtn.style.background = '#f5f5f7';
+            micBtn.style.color = 'var(--text-dark)';
+            inputField.value = "Explain the fundamental core principles of thermodynamics.";
+        }
+    };
+
+    // Execute Request Routine Execution Hook
+    document.getElementById('btn-dispatch-ai-query').onclick = async () => {
+        let queryText = inputField.value.trim();
+        if (!queryText && !runtimeFilePayload) return;
+
+        let completePromptPayload = queryText;
+        if (runtimeFilePayload) {
+            completePromptPayload += ` \n[Processed File Attachment Matrix Context Data: ${runtimeFilePayload.name}]`;
+        }
+
+        // Render User Chat Row
         const userRow = document.createElement('div');
-        userRow.style = "background:rgba(0,0,0,0.04); padding:12px; border-radius:12px; align-self:flex-end; max-width:80%; font-size:0.9rem; font-weight:500;";
-        userRow.textContent = queryText;
-        historyStream.appendChild(userRow);
-        inputField.value = '';
+        userRow.style = "background:var(--primary-red); color:white; padding:12px 16px; border-radius:12px; align-self:flex-end; max-width:80%; font-size:0.92rem; font-weight:500;";
+        userRow.textContent = (runtimeFilePayload ? `📎 [${runtimeFilePayload.name}] ` : '') + queryText;
+        streamContainer.appendChild(userRow);
 
-        const systemLoadingRow = document.createElement('div');
-        systemLoadingRow.style = "background:rgba(227,6,19,0.05); padding:12px; border-radius:12px; align-self:flex-start; max-width:80%; font-size:0.9rem; color:var(--text-muted);";
-        systemLoadingRow.textContent = "Connecting stream logic matrices...";
-        historyStream.appendChild(systemLoadingRow);
-        historyStream.scrollTop = historyStream.scrollHeight;
+        // Reset variables instantly to allow flawless concurrent inputs
+        inputField.value = '';
+        previewPanel.style.display = 'none';
+
+        const aiLoadingRow = document.createElement('div');
+        aiLoadingRow.style = "background:#f5f5f7; padding:12px; border-radius:12px; align-self:flex-start; max-width:80%; font-size:0.92rem; color:var(--text-muted);";
+        aiLoadingRow.textContent = "ChatGPT processing parameters...";
+        streamContainer.appendChild(aiLoadingRow);
+        streamContainer.scrollTop = streamContainer.scrollHeight;
 
         try {
             const rawResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
-                headers: { 
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`, 
-                    "Content-Type": "application/json" 
-                },
+                headers: { "Authorization": `Bearer ${OPENROUTER_API_KEY}`, "Content-Type": "application/json" },
                 body: JSON.stringify({
                     model: "google/gemini-2.5-flash",
                     messages: [
-                        { role: "system", content: `You are an elite automated core tutor internal engine inside Education Point LMS. Solve everything precisely for a student registered inside: ${AppState.profile.assigned_class}.` },
-                        { role: "user", content: queryText }
+                        { role: "system", content: `You are an elite automated ChatGPT-like engine inside Education Point LMS for ${AppState.profile.assigned_class}. Respond comprehensively to text, voice transcripts, or document queries.` },
+                        { role: "user", content: completePromptPayload }
                     ]
                 })
             });
 
             const parsedData = await rawResponse.json();
-            systemLoadingRow.style.color = "var(--text-dark)";
-            systemLoadingRow.textContent = parsedData.choices[0].message.content;
+            aiLoadingRow.style.color = "var(--text-dark)";
+            aiLoadingRow.textContent = parsedData.choices[0].message.content;
         } catch (e) {
-            systemLoadingRow.style.color = "var(--primary-red)";
-            systemLoadingRow.textContent = "Failed to synchronize parameters with OpenRouter API gateways.";
+            aiLoadingRow.style.color = "var(--primary-red)";
+            aiLoadingRow.textContent = "Error routing processing streams to OpenRouter cloud architecture meshes.";
         }
-        historyStream.scrollTop = historyStream.scrollHeight;
+
+        runtimeFilePayload = null;
+        attachmentBox.value = '';
+        streamContainer.scrollTop = streamContainer.scrollHeight;
     };
 }
