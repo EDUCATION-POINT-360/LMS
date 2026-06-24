@@ -27,28 +27,39 @@ function setupAuthenticationListener() {
     supabase.auth.onAuthStateChange(async (event, session) => {
         AppState.session = session;
         if (session) {
-            document.getElementById('app-sidebar').style.display = 'flex';
+            // User is Authenticated
+            const sidebar = document.getElementById('app-sidebar');
+            if (sidebar) sidebar.style.display = 'flex';
             await loadUserProfileAndSynchronize(session.user.id);
             renderMainInterfaceShell();
         } else {
-            document.getElementById('app-sidebar').style.display = 'none';
+            // User is Anonymous / Logged Out
+            const sidebar = document.getElementById('app-sidebar');
+            if (sidebar) sidebar.style.display = 'none';
             renderAuthenticationGateway();
         }
     });
 }
 
 async function loadUserProfileAndSynchronize(userId) {
+    // Fetches profile data matching the exact schema from your executed SQL script
     const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, full_name, username, role, assigned_class, xp_points, rank')
         .eq('id', userId)
         .single();
     
     if (!error && data) {
         AppState.profile = data;
     } else {
-        // Fallback object to ensure platform works flawlessly even during network drops
-        AppState.profile = { full_name: "Student User", role: "Student", assigned_class: "11th Class", xp_points: 120, rank: 3 };
+        // Safe runtime fallback matching your database columns structure
+        AppState.profile = { 
+            full_name: "Student User", 
+            role: "Student", 
+            assigned_class: "11th Class", 
+            xp_points: 0, 
+            rank: 1 
+        };
     }
 }
 
@@ -57,6 +68,8 @@ async function loadUserProfileAndSynchronize(userId) {
 // ==========================================
 function renderAuthenticationGateway() {
     const stage = document.getElementById('main-stage-target');
+    if (!stage) return;
+
     stage.innerHTML = `
         <div style="display:flex; align-items:center; justify-content:center; min-height:85vh; width:100%;">
             <div class="bento-card" style="max-width:450px; width:100%; padding:2.5rem; background:white;">
@@ -75,12 +88,8 @@ function renderAuthenticationGateway() {
     lucide.createIcons();
     bindLoginActions();
 
-    document.getElementById('btn-tab-login').onclick = () => {
-        toggleAuthTabs('login');
-    };
-    document.getElementById('btn-tab-register').onclick = () => {
-        toggleAuthTabs('register');
-    };
+    document.getElementById('btn-tab-login').onclick = () => toggleAuthTabs('login');
+    document.getElementById('btn-tab-register').onclick = () => toggleAuthTabs('register');
 }
 
 function toggleAuthTabs(mode) {
@@ -155,8 +164,11 @@ function bindLoginActions() {
         e.preventDefault();
         const email = document.getElementById('log-email').value;
         const password = document.getElementById('log-pass').value;
+        
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) alert(error.message);
+        if (error) {
+            alert(`Sign In Error: ${error.message}`);
+        }
     };
 }
 
@@ -169,12 +181,24 @@ function bindRegisterActions() {
         const selectedClass = document.getElementById('reg-class').value;
         const password = document.getElementById('reg-pass').value;
 
+        // Uses auth metadata that matches your SQL Trigger mapping perfectly
         const { error } = await supabase.auth.signUp({
-            email, password, options: { data: { full_name: name, username: user, role: 'Student', assigned_class: selectedClass } }
+            email, 
+            password, 
+            options: { 
+                data: { 
+                    full_name: name, 
+                    username: user, 
+                    role: 'Student', 
+                    assigned_class: selectedClass 
+                } 
+            }
         });
-        if (error) alert(error.message);
-        else {
-            alert('Account Provisioned Successfully!');
+        
+        if (error) {
+            alert(`Registration Error: ${error.message}`);
+        } else {
+            alert('Account Provisioned Successfully! You can log in now.');
             toggleAuthTabs('login');
         }
     };
@@ -185,6 +209,8 @@ function bindRegisterActions() {
 // ==========================================
 function renderMainInterfaceShell() {
     const menu = document.getElementById('sidebar-menu-target');
+    if (!menu) return;
+
     menu.innerHTML = `
         <li class="nav-item" data-v="dashboard"><a href="#"><i data-lucide="layout-dashboard"></i>Dashboard</a></li>
         <li class="nav-item" data-v="vault"><a href="#"><i data-lucide="book-open"></i>Study Vault</a></li>
@@ -200,19 +226,22 @@ function renderMainInterfaceShell() {
         };
     });
 
-    document.getElementById('user-profile-summary-target').innerHTML = `
-        <div style="display:flex; align-items:center; gap:12px; border-top:1px solid var(--card-border); padding-top:1.25rem;">
-            <div style="width:38px; height:38px; border-radius:50%; background:var(--primary-red); color:white; display:flex; align-items:center; justify-content:center; font-weight:700;">
-                ${AppState.profile.full_name.charAt(0)}
+    const summaryBox = document.getElementById('user-profile-summary-target');
+    if (summaryBox) {
+        summaryBox.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px; border-top:1px solid var(--card-border); padding-top:1.25rem;">
+                <div style="width:38px; height:38px; border-radius:50%; background:var(--primary-red); color:white; display:flex; align-items:center; justify-content:center; font-weight:700;">
+                    ${AppState.profile.full_name.charAt(0)}
+                </div>
+                <div style="flex-grow:1;">
+                    <h4 style="font-size:0.85rem; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${AppState.profile.full_name}</h4>
+                    <p style="font-size:0.75rem; color:var(--text-muted);">${AppState.profile.assigned_class}</p>
+                </div>
+                <i data-lucide="log-out" id="btn-logout" style="cursor:pointer; color:var(--primary-red); width:18px;"></i>
             </div>
-            <div style="flex-grow:1;">
-                <h4 style="font-size:0.85rem; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${AppState.profile.full_name}</h4>
-                <p style="font-size:0.75rem; color:var(--text-muted);">${AppState.profile.assigned_class}</p>
-            </div>
-            <i data-lucide="log-out" id="btn-logout" style="cursor:pointer; color:var(--primary-red); width:18px;"></i>
-        </div>
-    `;
-    document.getElementById('btn-logout').onclick = () => supabase.auth.signOut();
+        `;
+        document.getElementById('btn-logout').onclick = () => supabase.auth.signOut();
+    }
 
     executeNavigation(AppState.activeView);
 }
@@ -220,6 +249,7 @@ function renderMainInterfaceShell() {
 function executeNavigation(view) {
     AppState.activeView = view;
     const stage = document.getElementById('main-stage-target');
+    if (!stage) return;
     
     document.querySelectorAll('#sidebar-menu-target .nav-item').forEach(el => {
         el.classList.toggle('active', el.dataset.v === view);
@@ -276,10 +306,11 @@ async function loadVaultView(target) {
             <div class="bento-card">Querying RLS verified tables...</div>
         </div>
     `;
+    
+    // Queries your 'academic_materials' SQL database table smoothly
     const { data } = await supabase.from('academic_materials').select('*');
     const box = document.getElementById('vault-items-grid-target');
 
-    // Display robust mock cards matching user class if real database tables are empty
     const materialsList = (data && data.length > 0) ? data : [
         { title: `Complete Physics Notes - Chapter 1`, material_type: 'Notes', subject: 'Physics', file_url: '#' },
         { title: `Chemistry Ultimate Guess Paper`, material_type: 'Guess Paper', subject: 'Chemistry', file_url: '#' },
@@ -384,7 +415,7 @@ function loadChatView(target) {
 
     const windowBox = document.getElementById('chat-stream-window');
     
-    // Core Streaming Subscription Realtime Core Interface Integration Array Hook
+    // Subscribes automatically to the 'messages' table structure from your SQL file
     supabase.channel(`room-${AppState.activeChatRoom}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
         const msgNode = document.createElement('div');
         msgNode.style = "background:rgba(0,0,0,0.04); padding:10px 14px; border-radius:12px; align-self:flex-start; max-width:75%; font-size:0.9rem;";
@@ -404,7 +435,12 @@ function loadChatView(target) {
         windowBox.appendChild(dynamicNode);
         windowBox.scrollTop = windowBox.scrollHeight;
 
-        await supabase.from('messages').insert({ room_id: AppState.activeChatRoom, sender_id: AppState.session?.user?.id || '0000-0000', message_text: text });
+        // Inserts raw messages into your database schema structure
+        await supabase.from('messages').insert({ 
+            room_id: AppState.activeChatRoom, 
+            sender_id: AppState.session?.user?.id || null, 
+            message_text: text 
+        });
         input.value = '';
     };
 }
@@ -451,7 +487,10 @@ function loadAIView(target) {
         try {
             const rawResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
-                headers: { "Authorization": `Bearer ${OPENROUTER_API_KEY}`, "Content-Type": "application/json" },
+                headers: { 
+                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`, 
+                    "Content-Type": "application/json" 
+                },
                 body: JSON.stringify({
                     model: "google/gemini-2.5-flash",
                     messages: [
@@ -466,7 +505,7 @@ function loadAIView(target) {
             systemLoadingRow.textContent = parsedData.choices[0].message.content;
         } catch (e) {
             systemLoadingRow.style.color = "var(--primary-red)";
-            systemLoadingRow.textContent = "Failed to synchronize parameters with OpenRouter API mesh gateways.";
+            systemLoadingRow.textContent = "Failed to synchronize parameters with OpenRouter API gateways.";
         }
         historyStream.scrollTop = historyStream.scrollHeight;
     };
