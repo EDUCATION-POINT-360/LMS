@@ -3,195 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Education Point AI Hub</title>
+    <title>Education Point | Enterprise LMS Platform</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Production CDNs -->
+    <!-- UI Infrastructure Dependencies -->
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <!-- Gateway Authentication Viewport -->
-    <div id="auth-gateway-viewport" class="auth-wrapper">
-        <div class="bento-card auth-modal">
+    <!-- Global Toast Alert Center -->
+    <div id="toast-notification-hub" class="toast-hub"></div>
+
+    <!-- 1. AUTHENTICATION GATEWAY PORTAL (Matches Screen Specs) -->
+    <div id="auth-portal-viewport" class="auth-wrapper">
+        <div class="auth-bento-card">
             <div class="auth-header">
                 <i data-lucide="graduation-cap" class="brand-red-icon"></i>
-                <h2>Education Point 360</h2>
-                <p>Premium Learning Management & Resource Network</p>
+                <h2>Education Point</h2>
+                <p>Enterprise Learning Management Network</p>
             </div>
             
             <div class="auth-tab-switchers">
-                <button id="tab-trigger-login" class="tab-btn active">Sign In</button>
-                <button id="tab-trigger-register" class="tab-btn">Register</button>
+                <button id="tab-btn-signin" class="tab-btn active">Sign In</button>
+                <button id="tab-btn-signup" class="tab-btn">Create Profile</button>
             </div>
 
-            <form id="form-execution-login" class="auth-form-block active">
+            <!-- Sign In Matrix Layer -->
+            <form id="form-auth-signin" class="auth-form active">
                 <div class="input-group">
                     <label>EMAIL ADDRESS</label>
-                    <input type="email" id="login-email" class="input-field" required placeholder="mrizwank584@gmail.com">
+                    <input type="email" id="signin-email" class="input-field" required placeholder="name@domain.com">
                 </div>
                 <div class="input-group">
-                    <label>PASSWORD</label>
-                    <input type="password" id="login-password" class="input-field" required placeholder="••••••">
+                    <label>SECURE PASSWORD</label>
+                    <input type="password" id="signin-password" class="input-field" required placeholder="••••••••">
                 </div>
-                <button type="submit" class="btn-primary full-width">Initialize Session</button>
+                <button type="submit" class="btn-primary full-width">Initialize Workspace Session</button>
             </form>
 
-            <form id="form-execution-register" class="auth-form-block">
-                <div class="input-group">
-                    <label>USERNAME</label>
-                    <input type="text" id="register-username" class="input-field" required placeholder="Rizwan_edupoint">
-                </div>
-                <div class="input-group">
-                    <label>FULL NAME</label>
-                    <input type="text" id="register-fullname" class="input-field" required placeholder="Muhammad Rizwan">
+            <!-- Sign Up Matrix Layer (Enforces Class Selection Constraints) -->
+            <form id="form-auth-signup" class="auth-form">
+                <div class="form-grid-two-col">
+                    <div class="input-group">
+                        <label>USERNAME</label>
+                        <input type="text" id="signup-username" class="input-field" required placeholder="rizwan_edupoint">
+                    </div>
+                    <div class="input-group">
+                        <label>FULL NAME</label>
+                        <input type="text" id="signup-fullname" class="input-field" required placeholder="Muhammad Rizwan">
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>EMAIL ADDRESS</label>
-                    <input type="email" id="register-email" class="input-field" required placeholder="mrizwank584@gmail.com">
+                    <input type="email" id="signup-email" class="input-field" required placeholder="mrizwank584@gmail.com">
+                </div>
+                <div class="form-grid-two-col">
+                    <div class="input-group">
+                        <label>ACADEMIC STREAM CLASS</label>
+                        <select id="signup-class" class="input-field select-field" required>
+                            <option value="9th">9th Class</option>
+                            <option value="10th">10th Class</option>
+                            <option value="11th">11th Class</option>
+                            <option value="12th">12th Class</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>PORTAL ACCOUNT ROLE</label>
+                        <select id="signup-role" class="input-field select-field" required>
+                            <option value="Student">Student Tier</option>
+                            <option value="Teacher">Teacher Panelist</option>
+                            <option value="Admin">System Administrator</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="input-group">
-                    <label>SELECT CLASS</label>
-                    <select id="register-class" class="input-field dynamic-select">
-                        <option value="9th Class">9th Class</option>
-                        <option value="10th Class">10th Class</option>
-                        <option value="11th Class">11th Class</option>
-                        <option value="12th Class">12th Class</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>PASSWORD</label>
-                    <input type="password" id="register-password" class="input-field" required placeholder="••••••">
+                    <label>CHOOSE PASSWORD</label>
+                    <input type="password" id="signup-password" class="input-field" required placeholder="••••••••">
                 </div>
                 <button type="submit" class="btn-primary full-width">Complete Secure Registration</button>
             </form>
         </div>
     </div>
 
-    <!-- Protected Platform Grid Mesh -->
+    <!-- 2. INTERNAL PROTECTED ENTERPRISE ENGINE MESH -->
     <div id="protected-application-mesh" style="display: none;">
-        <header class="mobile-navigation-intercept-bar">
-            <div class="brand-flex"><i data-lucide="graduation-cap"></i><span>EduPoint 360</span></div>
-            <button id="sidebar-mobile-toggle"><i data-lucide="menu"></i></button>
+        <!-- Top App Navigation Interceptor Bar for Mobile Adaptive Layouts -->
+        <header class="mobile-navigation-top-bar">
+            <div class="brand-flex">
+                <i data-lucide="graduation-cap"></i>
+                <span>Education Point</span>
+            </div>
+            <button id="sidebar-mobile-toggle-btn"><i data-lucide="menu"></i></button>
         </header>
 
-        <div class="workspace-grid-container">
-            <!-- Sidebar Navigation -->
-            <aside id="app-sidebar-frame" class="premium-sidebar">
-                <div class="sidebar-top-cluster">
-                    <div class="brand-flex hidden-on-mobile"><i data-lucide="graduation-cap"></i><span>EduPoint 360</span></div>
-                    <ul class="navigation-link-list">
-                        <li class="nav-link-item active" data-target="dashboard-view"><a href="#"><i data-lucide="layout-dashboard"></i>LMS Dashboard</a></li>
-                        <li class="nav-link-item" data-target="resources-view"><a href="#"><i data-lucide="book-open"></i>Study Resources</a></li>
-                        <li class="nav-link-item" data-target="chatgpt-view"><a href="#"><i data-lucide="cpu"></i>ChatGPT Core AI</a></li>
-                        <li class="nav-link-item" data-target="contact-rizwan-view"><a href="#"><i data-lucide="help-circle"></i>Help Desk (Rizwan)</a></li>
-                        <li class="nav-link-item" data-target="admin-view" id="admin-nav-link" style="display: none;"><a href="#"><i data-lucide="shield-alert"></i>Admin Panel</a></li>
+        <div class="workspace-grid-layout">
+            <!-- Sidebar Navigation Canvas Component -->
+            <aside id="app-sidebar-panel" class="premium-sidebar">
+                <div class="sidebar-top-group">
+                    <div class="brand-flex hidden-on-mobile">
+                        <i data-lucide="graduation-cap"></i>
+                        <span>EduPoint Pro</span>
+                    </div>
+                    <ul class="sidebar-navigation-links">
+                        <li class="nav-item active" data-target="view-student-dashboard"><a href="#"><i data-lucide="layout-dashboard"></i>Dashboard</a></li>
+                        <li class="nav-item" data-target="view-resource-vault"><a href="#"><i data-lucide="book-open"></i>Resource Vault</a></li>
+                        <li class="nav-item" data-target="view-online-test-center"><a href="#"><i data-lucide="award"></i>Online Tests</a></li>
+                        <li class="nav-item" data-target="view-student-support-desk"><a href="#"><i data-lucide="help-circle"></i>Support Tickets</a></li>
+                        <li class="nav-item" data-target="view-community-forum"><a href="#"><i data-lucide="users"></i>Community Forum</a></li>
+                        <li class="nav-item" data-target="view-teacher-panel" id="sidebar-link-teacher" style="display: none;"><a href="#"><i data-lucide="edit-3"></i>Teacher Console</a></li>
+                        <li class="nav-item" data-target="view-admin-panel" id="sidebar-link-admin" style="display: none;"><a href="#"><i data-lucide="shield"></i>Admin Core Control</a></li>
                     </ul>
                 </div>
-                <div class="sidebar-footer-profile-card" id="user-identity-card-target"></div>
+                
+                <!-- Active Session Profile Infrastructure Footer Component -->
+                <div class="sidebar-user-footer-card" id="user-profile-summary-card">
+                    <!-- Dynamic Injections via Script Engine -->
+                </div>
             </aside>
 
-            <!-- Main Stage Content -->
-            <main class="main-content-viewport">
-                
-                <!-- VIEW 1: LMS DASHBOARD & ACADEMIC NEWS -->
-                <section id="dashboard-view" class="view-panel active">
-                    <div class="bento-header-banner">
-                        <h2 id="welcome-username-string">Welcome back...</h2>
-                        <p id="welcome-class-string">Stream Class Allocation: Active</p>
+            <!-- Main Stage Content Engine Viewport Window -->
+            <main class="main-content-viewport" id="main-viewport-stage">
+
+                <!-- VIEW A: STUDENT DASHBOARD PORTAL -->
+                <section id="view-student-dashboard" class="view-panel active">
+                    <div class="bento-banner-card welcome-gradient">
+                        <h2 id="student-welcome-title-string">Welcome back...</h2>
+                        <p id="student-welcome-subtitle-string">Class-restricted profile stream currently synced successfully.</p>
+                    </div>
+                    <div class="bento-grid-metrics">
+                        <div class="bento-metric-card">
+                            <div class="card-metric-flex">
+                                <h3>Study Streak</h3>
+                                <i data-lucide="zap" style="color: #ff9500;"></i>
+                            </div>
+                            <h1 id="metric-streak-value">1 Day</h1>
+                        </div>
+                        <div class="bento-metric-card">
+                            <div class="card-metric-flex">
+                                <h3>XP System Progress</h3>
+                                <i data-lucide="star" style="color: #ffcc00;"></i>
+                            </div>
+                            <h1 id="metric-xp-value">0 XP</h1>
+                        </div>
+                        <div class="bento-metric-card">
+                            <div class="card-metric-flex">
+                                <h3>Assigned Badges</h3>
+                                <i data-lucide="shield-check" style="color: var(--primary-red);"></i>
+                            </div>
+                            <h1 id="metric-badge-value">Novice</h1>
+                        </div>
+                    </div>
+
+                    <h3 class="section-sub-heading">Real-Time System Announcements</h3>
+                    <div class="announcements-stack-container" id="announcements-target-container">
+                        <!-- Injected dynamically -->
+                    </div>
+                </section>
+
+                <!-- VIEW B: STUDY RESOURCES INTERACTIVE SECURE STORAGE VAULT -->
+                <section id="view-resource-vault" class="view-panel">
+                    <div class="bento-banner-card">
+                        <h2>Academic Secure Resource Vault</h2>
+                        <p>Class-locked database access pipeline strictly enforced via Row Level Security.</p>
                     </div>
                     
-                    <h3 class="section-title">Latest Educational News & Notifications</h3>
-                    <div class="bento-grid" id="news-matrix-container">
-                        <!-- Dynamic News Cards Injected Here -->
-                        <div class="bento-card educational-news-card continuous-glow">
-                            <span class="badge red-badge">BISE Update</span>
-                            <h4>Board Exam Schedules Announcement</h4>
-                            <p>All Punjab boards pairing schemes and dynamic schedules for final term sessions have been optimized inside the resource block.</p>
+                    <div class="resource-filter-row">
+                        <button class="resource-filter-btn active" data-type="all">All Modules</button>
+                        <button class="resource-filter-btn" data-type="Notes">Notes</button>
+                        <button class="resource-filter-btn" data-type="Guess Papers">Guess Papers</button>
+                        <button class="resource-filter-btn" data-type="Past Papers">Past Papers</button>
+                        <button class="resource-filter-btn" data-type="Pairing Scheme">Pairing Scheme</button>
+                        <button class="resource-filter-btn" data-type="Preparation Material">Prep Sheets</button>
+                    </div>
+
+                    <div class="resources-bento-grid-mesh" id="resource-vault-cards-injector">
+                        <!-- Dynamic content loading architecture goes here -->
+                    </div>
+                </section>
+
+                <!-- VIEW C: ONLINE COMPUTERIZED TESTING SYSTEM ENGINE -->
+                <section id="view-online-test-center" class="view-panel">
+                    <div class="bento-banner-card" style="background: linear-gradient(135deg, #1d1d1f, #e30613); color: white;">
+                        <h2>Computerized Online MCQ Testing Engine</h2>
+                        <p>Auto-checking system validation array protocols with active timer tracking parameters.</p>
+                    </div>
+                    
+                    <div id="test-center-selection-panel" class="bento-grid-metrics" style="margin-top: 20px;">
+                        <!-- Available Tests Cards Injected Here -->
+                    </div>
+
+                    <!-- Live Active Test Taking Screen Interface Layer -->
+                    <div id="live-active-test-execution-viewport" class="bento-metric-card" style="display: none; margin-top: 25px; padding: 2.5rem;">
+                        <div class="test-execution-header-meta">
+                            <h3 id="live-test-title-string">Active MCQ Screening Exam</h3>
+                            <div class="timer-countdown-badge"><i data-lucide="clock"></i> <span id="test-timer-clock-string">00:00</span></div>
+                        </div>
+                        <hr class="separator-line">
+                        <div id="live-test-questions-injector-stack">
+                            <!-- Injected questions blocks -->
+                        </div>
+                        <button id="btn-submit-completed-exam-form" class="btn-primary" style="margin-top:20px;">Evaluate & Submit Test Sheet</button>
+                    </div>
+                </section>
+
+                <!-- VIEW D: STUDENT FILE-ATTACHMENT SUPPORT SYSTEM TICKETING PLATFORM -->
+                <section id="view-student-support-desk" class="view-panel">
+                    <div class="bento-banner-card">
+                        <h2>Enterprise Support Ticket Desk</h2>
+                        <p>Direct communication channel array routing queries directly into the Admin control viewspace.</p>
+                    </div>
+
+                    <div class="support-ticket-split-grid">
+                        <form id="form-support-ticket-submission" class="bento-metric-card">
+                            <h3 class="section-sub-heading" style="margin-top:0;">Open Support Case Ticket</h3>
+                            <div class="input-group">
+                                <label>QUERY CLASSIFICATION CATEGORY</label>
+                                <select id="support-ticket-category" class="input-field select-field" required>
+                                    <option value="Academic Issue">Academic Asset Issue</option>
+                                    <option value="LMS Bug">LMS Technical Malfunction Bug</option>
+                                    <option value="Profile Correction">Profile Allocation Correction</option>
+                                    <option value="Other">Other Category Query</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>COMPREHENSIVE CASE DESCRIPTION MESSAGING</label>
+                                <textarea id="support-ticket-body" class="input-field textarea-field" rows="4" required placeholder="Provide a granular operational detail of the issue..."></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label>ATTACH DATA FILE PAYLOAD (IMAGE/PDF)</label>
+                                <input type="file" id="support-ticket-file-payload" class="input-field" accept="image/*,application/pdf">
+                            </div>
+                            <button type="submit" class="btn-primary full-width">Transmit Secure Support Ticket</button>
+                        </form>
+
+                        <div class="bento-metric-card">
+                            <h3 class="section-sub-heading" style="margin-top:0;">Track Open/Resolved Case Logs</h3>
+                            <div class="ticket-scroller-track-mesh" id="student-support-tickets-scroller-target">
+                                <!-- Loaded dynamically via Supabase pipelines -->
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- VIEW 2: STUDY RESOURCES (GUESS PAPERS, SCHEMES, NOTES) -->
-                <section id="resources-view" class="view-panel">
-                    <div class="bento-header-banner">
-                        <h2>Education Point Resource Vault</h2>
-                        <p>Access high-yield Guess Papers, Pairing Schemes, and Core Solutions instantly.</p>
+                <!-- VIEW E: REAL-TIME CLASS FILTERED COMMUNITY FORUM DISCUSSIONS -->
+                <section id="view-community-forum" class="view-panel">
+                    <div class="bento-banner-card">
+                        <h2>Ecosystem Class-Filtered Community Lounge</h2>
+                        <p>Share, network, collaborate, and deliberate topics locked within your peer cohort.</p>
                     </div>
 
-                    <div class="resource-filter-bar">
-                        <button class="filter-btn active" data-filter="all">All Materials</button>
-                        <button class="filter-btn" data-filter="guess">Guess Papers</button>
-                        <button class="filter-btn" data-filter="scheme">Pairing Schemes</button>
-                        <button class="filter-btn" data-filter="notes">Study Notes</button>
+                    <div class="forum-posting-console bento-metric-card" style="margin-top: 20px;">
+                        <div class="input-group">
+                            <textarea id="forum-new-post-textarea" class="input-field textarea-field" rows="2" placeholder="Draft something interesting to broadcast inside your class network..."></textarea>
+                        </div>
+                        <button id="btn-broadcast-community-post" class="btn-primary" style="margin-top:10px; float:right;">Broadcast Thread</button>
+                        <div style="clear:both;"></div>
                     </div>
 
-                    <div class="bento-grid" id="resources-grid-injector" style="margin-top: 20px;">
-                        <!-- Injected via JavaScript dynamically -->
+                    <div class="forum-stream-stack-injector" id="community-forum-stream-target" style="margin-top:25px;">
+                        <!-- Thread components loaded dynamically here -->
                     </div>
                 </section>
 
-                <!-- VIEW 3: CHATGPT MULTIMODAL ADVANCED AI AGENT -->
-                <section id="chatgpt-view" class="view-panel">
-                    <div class="ai-workspace-wrapper">
-                        <div class="ai-terminal-stream-history" id="ai-chat-scroller-node">
-                            <div class="ai-bubble assistant">
-                                <i data-lucide="bot" class="ai-icon-avatar"></i>
-                                <div class="ai-message-body">
-                                    <p>Greetings. I am your enhanced ChatGPT engine. Send texts, attach files/images, or record audio streams directly for fast analytical computations.</p>
+                <!-- VIEW F: TEACHER RESOURCE PROVISIONING MANAGEMENT PANEL CONSOLE -->
+                <section id="view-teacher-panel" class="view-panel">
+                    <div class="bento-banner-card" style="background: linear-gradient(135deg, #e30613, #b8050f); color:white;">
+                        <h2>Academic Panelist Console Node</h2>
+                        <p>Deploy course solutions, manage testing modules, and inspect peer analytics frameworks.</p>
+                    </div>
+
+                    <div class="form-grid-two-col" style="margin-top: 25px;">
+                        <!-- Resource Uploader Form Block -->
+                        <form id="form-teacher-resource-upload" class="bento-metric-card">
+                            <h3 class="section-sub-heading" style="margin-top:0;">Deploy Academic Vault Payload</h3>
+                            <div class="input-group">
+                                <label>TARGET TARGET COHORT CLASS</label>
+                                <select id="teacher-upload-class" class="input-field select-field" required>
+                                    <option value="9th">9th Class</option>
+                                    <option value="10th">10th Class</option>
+                                    <option value="11th">11th Class</option>
+                                    <option value="12th">12th Class</option>
+                                </select>
+                            </div>
+                            <div class="form-grid-two-col">
+                                <div class="input-group">
+                                    <label>DOCUMENT VAULT MODULE CATEGORY</label>
+                                    <select id="teacher-upload-type" class="input-field select-field" required>
+                                        <option value="Notes">Notes</option>
+                                        <option value="Guess Papers">Guess Papers</option>
+                                        <option value="Past Papers">Past Papers</option>
+                                        <option value="Pairing Scheme">Pairing Scheme</option>
+                                        <option value="Preparation Material">Preparation Material</option>
+                                    </select>
                                 </div>
+                                <div class="input-group">
+                                    <label>SUBJECT IDENTIFICATION INDEX</label>
+                                    <input type="text" id="teacher-upload-subject" class="input-field" required placeholder="e.g., Mathematics">
+                                    </div>
                             </div>
-                        </div>
+                            <div class="input-group">
+                                <label>RESOURCE ENTRY DOCUMENT TITLE</label>
+                                <input type="text" id="teacher-upload-title" class="input-field" required placeholder="e.g., 11th Math full book solution 2025.pdf">
+                            </div>
+                            <div class="input-group">
+                                <label>BRIEF SYNOPSIS DESCRIPTION</label>
+                                <input type="text" id="teacher-upload-desc" class="input-field" required placeholder="Provide data contents outline synopsis...">
+                            </div>
+                            <div class="input-group">
+                                <label>UPLOAD NATIVE BINARY PAYLOAD FILE</label>
+                                <input type="file" id="teacher-upload-binary-file" class="input-field" required>
+                            </div>
+                            <button type="submit" class="btn-primary full-width">Inject Resource Into Vault Engine</button>
+                        </form>
 
-                        <div id="ai-runtime-attachment-preview-bar" class="ai-preview-tray" style="display: none;">
-                            <div class="preview-meta-flex">
-                                <i data-lucide="file-text" id="ai-preview-icon-indicator"></i>
-                                <span id="ai-preview-filename-string">payload.pdf</span>
+                        <!-- Announcement Deployment Form Block -->
+                        <form id="form-teacher-announcement-post" class="bento-metric-card">
+                            <h3 class="section-sub-heading" style="margin-top:0;">Broadcast Official Operational Announcement</h3>
+                            <div class="input-group">
+                                <label>TARGET DESTINATION LEVEL</label>
+                                <select id="teacher-announce-target" class="input-field select-field" required>
+                                    <option value="All">All Registered Institutional Tiers</option>
+                                    <option value="9th">9th Class Only</option>
+                                    <option value="10th">10th Class Only</option>
+                                    <option value="11th">11th Class Only</option>
+                                    <option value="12th">12th Class Only</option>
+                                </select>
                             </div>
-                            <button id="btn-strip-attached-payload" class="clear-btn">✕</button>
-                        </div>
-
-                        <div class="ai-input-console-footer">
-                            <input type="file" id="ai-native-system-file-input" style="display: none;" accept="image/*,application/pdf,text/plain">
-                            <div class="console-action-buttons-group">
-                                <button id="btn-trigger-doc-upload" class="console-icon-btn"><i data-lucide="paperclip"></i></button>
-                                <button id="btn-trigger-voice-mic" class="console-icon-btn"><i data-lucide="mic"></i></button>
+                            <div class="input-group">
+                                <label>ANNOUNCEMENT NOTICE TITULAR</label>
+                                <input type="text" id="teacher-announce-title" class="input-field" required placeholder="e.g., Final Term Board Exam Notification Update">
                             </div>
-                            <input type="text" id="ai-terminal-input-prompt" class="input-field console-text-input" placeholder="Ask ChatGPT anything...">
-                            <button id="btn-dispatch-ai-computation" class="btn-primary console-send-btn">Compute AI</button>
-                        </div>
+                            <div class="input-group">
+                                <label>BODY NOTIFICATION MESSAGE CONTENT TEXT</label>
+                                <textarea id="teacher-announce-body" class="input-field textarea-field" rows="4" required placeholder="Draft full layout criteria instructions text here..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary full-width">Transmit Official Bulletin</button>
+                        </form>
                     </div>
                 </section>
 
-                <!-- VIEW 4: DIRECT DESK TO MUHAMMAD RIZWAN -->
-                <section id="contact-rizwan-view" class="view-panel">
-                    <div class="bento-header-banner" style="background: linear-gradient(135deg, #fff, rgba(227,6,19,0.05));">
-                        <h2>Direct Support Platform</h2>
-                        <p>Submit your system query or issue below. It will be delivered directly to <strong>Muhammad Rizwan</strong> in real-time.</p>
+                <!-- VIEW G: ROOT ENTERPRISE ECOLOGICAL ADMINISTRATION CENTRAL CONTROL CENTER -->
+                <section id="view-admin-panel" class="view-panel">
+                    <div class="bento-banner-card" style="background: #1d1d1f; color: white;">
+                        <h2>Enterprise Core Administration Cockpit Panel</h2>
+                        <p>Real-time system matrix analysis parameters tracking global node vectors natively.</p>
                     </div>
 
-                    <div class="bento-card" style="max-width:600px; margin: 20px auto;">
-                        <div class="input-group" style="margin-bottom: 15px;">
-                            <label>YOUR INSTANT QUERY / COMPLAINT</label>
-                            <textarea id="support-query-textarea" rows="5" class="input-field" placeholder="Type what you want to ask Muhammad Rizwan..."></textarea>
-                        </div>
-                        <button id="btn-submit-support-query" class="btn-primary full-width">Send Directly to Rizwan</button>
+                    <div class="bento-grid-metrics" style="margin-top: 25px;">
+                        <div class="bento-metric-card"><h3>Global System Users</h3><h1 id="admin-metric-users-count">0 Users</h1></div>
+                        <div class="bento-metric-card"><h3>Vault Files Tracked</h3><h1 id="admin-metric-files-count">0 Records</h1></div>
+                        <div class="bento-metric-card"><h3>Support Tickets In-Flight</h3><h1 id="admin-metric-tickets-count">0 Open</h1></div>
                     </div>
-                </section>
 
-                <!-- VIEW 5: ADMIN AUDIT LOG TERMINAL -->
-                <section id="admin-view" class="view-panel">
-                    <div class="bento-header-banner" style="background: #1d1d1f; color: white;">
-                        <h2>Ecosystem Management Dashboard</h2>
-                        <p>Logged-in as Admin Module Controller</p>
-                    </div>
-                    <div class="bento-grid" style="margin-top: 20px;">
-                        <div class="bento-card">
-                            <h3>Real-Time Support Inbox</h3>
-                            <div id="admin-inbox-queries-target" style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">
-                                <!-- Dynamic Submissions load here for Rizwan to monitor -->
-                                <p style="color:var(--text-muted)">No active pending ticket arrays found.</p>
+                    <!-- Administration System Split Workspace Modules -->
+                    <div class="form-grid-two-col" style="margin-top:25px;">
+                        <!-- Master Support Tickets Communications Interception Console Hub -->
+                        <div class="bento-metric-card">
+                            <h3 class="section-sub-heading" style="margin-top:0;">Global Technical Support Center</h3>
+                            <div class="ticket-scroller-track-mesh" id="admin-support-center-inbox-injector">
+                                <!-- Live Realtime incoming data array pipes -->
                             </div>
+                        </div>
+
+                        <!-- System Metric Analytic Performance Charts Canvas Module Container -->
+                        <div class="bento-metric-card">
+                            <h3 class="section-sub-heading" style="margin-top:0;">Platform Vector Resource Analytics</h3>
+                            <canvas id="admin-core-analytics-canvas-node" width="400" height="250"></canvas>
                         </div>
                     </div>
                 </section>
@@ -200,6 +378,7 @@
         </div>
     </div>
 
+    <!-- Core Runtime Execution Pipeline Script Matrix Integration Injection Node -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
