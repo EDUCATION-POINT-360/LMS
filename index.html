@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education Point LMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+</head>
+<body>
+
+    <div id="app-layout">
+        <aside class="sidebar">
+            <div class="top-segment">
+                <div class="brand-wrapper">
+                    <i data-lucide="graduation-cap"></i>
+                    <span>Education Point</span>
+                </div>
+                <ul class="nav-links" id="sidebar-menu-target">
+                    </ul>
+            </div>
+            <div class="bottom-segment" id="user-profile-summary-target">
+                </div>
+        </aside>
+
+        <main class="workspace" id="main-stage-target">
+            </main>
+    </div>
+
+    <div class="toast-container" id="toast-center"></div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
+
