@@ -8,14 +8,21 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 </head>
 <body>
 
     <div id="app-layout">
-        <aside class="sidebar">
+        <header class="mobile-navbar" id="mobile-top-bar" style="display: none;">
+            <div class="brand-wrapper">
+                <i data-lucide="graduation-cap"></i>
+                <span>Education Point</span>
+            </div>
+            <button id="mobile-menu-toggle-btn"><i data-lucide="menu"></i></button>
+        </header>
+
+        <aside class="sidebar" id="app-sidebar" style="display: none;">
             <div class="top-segment">
-                <div class="brand-wrapper">
+                <div class="brand-wrapper hidden-on-mobile">
                     <i data-lucide="graduation-cap"></i>
                     <span>Education Point</span>
                 </div>
@@ -27,12 +34,15 @@
         </aside>
 
         <main class="workspace" id="main-stage-target">
-            </main>
+            <div class="initialization-flex-container">
+                <div class="bento-card text-center">
+                    <h2>Initializing System Infrastructure...</h2>
+                    <p style="color: var(--text-muted); margin-top: 10px;">Connecting secure real-time encryption bridges.</p>
+                </div>
+            </div>
+        </main>
     </div>
-
-    <div class="toast-container" id="toast-center"></div>
 
     <script type="module" src="app.js"></script>
 </body>
 </html>
-
