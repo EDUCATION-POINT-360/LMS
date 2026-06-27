@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Root Admin Interface Portal — Education Point</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-apple-light text-apple-dark native-sans antialiased overflow-x-hidden flex">
+
+    <div id="admin-toast-system" class="toast-portal-fixed"></div>
+
+    <aside class="w-64 fixed h-screen left-0 top-0 border-r border-gray-200/60 bg-white/80 backdrop-blur-xl flex flex-col justify-between z-40 p-4 transition-transform transform -translate-x-full md:translate-x-0" id="admin-sidebar-node">
+        <div class="space-y-6">
+            <div class="flex items-center gap-3 px-2 py-3 border-b border-gray-100">
+                <div class="bg-red-gradient rounded-xl p-2 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="text-white width-20 height-20"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-sm tracking-tight text-gray-800 leading-none">Education Point</h2>
+                    <span class="text-[10px] font-extrabold text-red-600 uppercase tracking-widest block mt-1">Infrastructure Control</span>
+                </div>
+            </div>
+
+            <nav id="admin-sidebar-navigation-links" class="space-y-1">
+                <button data-target="admin-dashboard" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all active-nav"><i data-lucide="pie-chart" class="w-5 h-5"></i> Enterprise Hub</button>
+                <button data-target="admin-students" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="users" class="w-5 h-5"></i> Student Profiles Registry</button>
+                <button data-target="admin-content" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="upload-cloud" class="w-5 h-5"></i> Content Deployment Node</button>
+                <button data-target="admin-tests" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="binary" class="w-5 h-5"></i> Test Engine Matrix</button>
+                <button data-target="admin-notifications" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="megaphone" class="w-5 h-5"></i> Broadcast Announcements</button>
+                <button data-target="admin-support" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="ticket" class="w-5 h-5"></i> Support Tickets Manifest</button>
+                <button data-target="admin-community" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="shield-alert" class="w-5 h-5"></i> Forum Moderation Node</button>
+            </nav>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100 flex flex-col gap-2">
+            <button id="btn-admin-logout" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-colors"><i data-lucide="log-out" class="w-4 h-4"></i> Terminate Identity Control Session</button>
+        </div>
+    </aside>
+
+    <div class="flex-grow md:ml-64 min-h-screen flex flex-col justify-between overflow-x-hidden">
+        
+        <header class="h-20 border-b border-gray-200/60 bg-white/40 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <button id="admin-sidebar-toggle" class="p-2 rounded-xl hover:bg-gray-100 md:hidden transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6 text-gray-600"></i>
+                </button>
+                <h1 class="font-bold text-base tracking-tight text-gradient-apple hidden sm:block">Infrastructure Core Management Console</h1>
+            </div>
+            
+            <div class="flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-2xl border border-gray-200/30">
+                <div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-xs font-bold text-gray-600 uppercase tracking-wider">Supabase Live Connection Engine Pipeline Enabled</span>
+            </div>
+        </header>
+
+        <main id="admin-app-view-router-target" class="p-6 flex-grow relative">
+            
+            <section id="view-admin-dashboard" class="admin-view space-y-8 animate-fade-in">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-card bg-white p-5 border border-gray-200/70 rounded-2xl flex items-center gap-4 shadow-sm">
+                        <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center"><i data-lucide="users" class="w-6 h-6"></i></div>
+                        <div><span class="text-xs text-gray-400 block font-medium">Total Registered Students</span><h3 class="text-xl font-bold" id="metric-admin-total-students">0</h3></div>
+                    </div>
+                    <div class="glass-card bg-white p-5 border border-gray-200/70 rounded-2xl flex items-center gap-4 shadow-sm">
+                        <div class="w-12 h-12 bg-green-50 text-green-500 rounded-xl flex items-center justify-center"><i data-lucide="activity" class="w-6 h-6"></i></div>
+                        <div><span class="text-xs text-gray-400 block font-medium">Active Realtime Sockets</span><h3 class="text-xl font-bold" id="metric-admin-online-students">0</h3></div>
+                    </div>
+                    <div class="glass-card bg-white p-5 border border-gray-200/70 rounded-2xl flex items-center gap-4 shadow-sm">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center"><i data-lucide="file-text" class="w-6 h-6"></i></div>
+                        <div><span class="text-xs text-gray-400 block font-medium">Total Resource Content Nodes</span><h3 class="text-xl font-bold" id="metric-admin-total-content">0</h3></div>
+                    </div>
+                    <div class="glass-card bg-white p-5 border border-gray-200/70 rounded-2xl flex items-center gap-4 shadow-sm">
+                        <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center"><i data-lucide="download-cloud" class="w-6 h-6"></i></div>
+                        <div><span class="text-xs text-gray-400 block font-medium">Aggregated Media Egress Logs</span><h3 class="text-xl font-bold" id="metric-admin-total-downloads">0</h3></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass-card bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+                        <h3 class="font-bold text-sm text-gray-700 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-red-500"></i> Class Target Density Metric Registration Analytics</h3>
+                        <div class="relative h-64"><canvas id="adminClassDensityChart"></canvas></div>
+                    </div>
+                    <div class="glass-card bg-white border border-gray-200 rounded-3xl p-6 shadow-sm space-y-4">
+                        <h3 class="font-bold text-sm text-gray-700 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-red-500"></i> Infrastructure Stream Logs</h3>
+                        <div id="admin-dashboard-activity-logs-viewport" class="divide-y divide-gray-50 text-[11px] text-gray-500 max-h-64 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-admin-students" class="admin-view space-y-6 hidden animate-fade-in">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight">Student Identity Profiles Registry</h2>
+                        <p class="text-xs text-gray-400">Perform direct master mutations: view profiles, manipulate parameters, block infrastructure entry nodes, reset security credentials</p>
+                    </div>
+                    <input type="text" id="admin-students-search-input" class="bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs w-full sm:w-64 outline-none" placeholder="Filter profiles registry query...">
+                </div>
+
+                <div class="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-100 font-bold text-gray-500 uppercase tracking-wider">
+                                    <th class="p-4">Profile Identity Node</th>
+                                    <th class="p-4">Contact Matrix</th>
+                                    <th class="p-4">Academic Mappings</th>
+                                    <th class="p-4">Operational State</th>
+                                    <th class="p-4 text-right">Administrative Controls</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-students-table-body-target" class="divide-y divide-gray-100 text-gray-600">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-admin-content" class="admin-view space-y-6 hidden animate-fade-in">
+                <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight">Content Inventory Deployment Console Node</h2>
+                        <p class="text-xs text-gray-400">Upload notes, past sheets, board maps directly to Supabase storage buckets</p>
+                    </div>
+                    <button id="btn-admin-trigger-content-upload-modal" class="bg-red-gradient text-white text-xs font-semibold px-5 py-2.5 rounded-xl shadow-sm flex items-center gap-1.5"><i data-lucide="plus" class="w-4 h-4"></i> Deploy New Resource</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="admin-content-inventory-manifest-target"></div>
+
+                <div id="admin-content-upload-modal-overlay" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm items-center justify-center z-50 p-4 hidden flex">
+                    <form id="admin-content-upload-master-form" class="bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border border-gray-100 space-y-4 animate-scale-up max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <h3 class="font-bold text-sm text-gray-800">Provision Content Document Vector Bundle</h3>
+                            <button type="button" id="btn-close-content-modal" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label for="content-upload-title" class="text-xs font-semibold text-gray-500 uppercase">Resource Document Title</label>
+                                <input type="text" id="content-upload-title" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="content-upload-module-type" class="text-xs font-semibold text-gray-500 uppercase">Target Engine Sub-Module</label>
+                                <select id="content-upload-module-type" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500">
+                                    <option value="notes">Lecture Notes</option>
+                                    <option value="guess_papers">Board Guess Papers</option>
+                                    <option value="past_papers">Historical Past Papers</option>
+                                    <option value="pairing_scheme">Pairing Schemes Layout Map</option>
+                                    <option value="preparation_materials">Prep Materials Core Stack</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="space-y-1">
+                                <label for="content-upload-class" class="text-xs font-semibold text-gray-500 uppercase">Class Mapping</label>
+                                <select id="content-upload-class" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500">
+                                    <option value="9th">9th Class</option>
+                                    <option value="10th">10th Class</option>
+                                    <option value="11th">11th Class</option>
+                                    <option value="12th">12th Class</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label for="content-upload-subject" class="text-xs font-semibold text-gray-500 uppercase">Subject</label>
+                                <input type="text" id="content-upload-subject" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500" placeholder="e.g., Mathematics">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="content-upload-board" class="text-xs font-semibold text-gray-500 uppercase">Board Scope Filter</label>
+                                <input type="text" id="content-upload-board" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500" placeholder="e.g., All Boards">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label for="content-upload-chapter" class="text-xs font-semibold text-gray-500 uppercase">Chapter Reference (Notes Specific)</label>
+                                <input type="text" id="content-upload-chapter" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500" placeholder="e.g., Chapter 1 Matrix">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="content-upload-year" class="text-xs font-semibold text-gray-500 uppercase">Year Target (Past Papers Specific)</label>
+                                <input type="number" id="content-upload-year" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500" placeholder="e.g., 2025" value="2026">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label for="content-upload-description" class="text-xs font-semibold text-gray-500 uppercase">Metadata Core Description String</label>
+                            <textarea id="content-upload-description" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500 h-16 resize-none"></textarea>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-gray-500 uppercase">Storage Blob File Asset Node Selection Target</label>
+                            <div class="relative border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center bg-gray-50 flex flex-col items-center justify-center hover:border-red-400 transition-colors">
+                                <i data-lucide="file" class="text-gray-400 w-8 h-8 mb-1"></i>
+                                <span class="text-xs text-gray-400" id="admin-content-upload-file-label">Select Resource PDF File Asset</span>
+                                <input type="file" id="content-upload-file-binary-input" required accept="application/pdf" class="absolute inset-0 opacity-0 cursor-pointer">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-red-gradient text-white font-semibold text-xs py-3.5 rounded-xl shadow-md">Execute Document Storage Stream Pipeline & Commit Record</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="view-admin-tests" class="admin-view space-y-6 hidden animate-fade-in">
+                <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight">Test Suite Engineering System Matrix</h2>
+                        <p class="text-xs text-gray-400">Assemble localized testing nodes, inject algorithmic questions arrays, evaluate results datasets</p>
+                    </div>
+                    <button id="btn-admin-trigger-create-test-modal" class="bg-red-gradient text-white text-xs font-semibold px-5 py-2.5 rounded-xl shadow-sm flex items-center gap-1.5"><i data-lucide="plus" class="w-4 h-4"></i> Establish Test Node</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="admin-tests-suite-manifest-target"></div>
+
+                <div id="admin-test-creation-modal-overlay" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm items-center justify-center z-50 p-4 hidden flex">
+                    <form id="admin-test-creation-master-form" class="bg-white rounded-3xl w-full max-w-xl p-6 shadow-2xl border border-gray-100 space-y-4 animate-scale-up max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <h3 class="font-bold text-sm text-gray-800">Establish Automated Testing Paradigm Session</h3>
+                            <button type="button" id="btn-close-test-modal" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="space-y-1 col-span-2">
+                                <label for="test-create-title" class="text-xs font-semibold text-gray-500 uppercase">Test Designation Title</label>
+                                <input type="text" id="test-create-title" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="test-create-class" class="text-xs font-semibold text-gray-500 uppercase">Class Scope Target</label>
+                                <select id="test-create-class" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500">
+                                    <option value="9th">9th Class</option>
+                                    <option value="10th">10th Class</option>
+                                    <option value="11th">11th Class</option>
+                                    <option value="12th">12th Class</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label for="test-create-subject" class="text-xs font-semibold text-gray-500 uppercase">Subject Context</label>
+                                <input type="text" id="test-create-subject" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="test-create-duration" class="text-xs font-semibold text-gray-500 uppercase">Timer Constraint Interval (Minutes)</label>
+                                <input type="number" id="test-create-duration" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500" value="20">
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-4 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-xs uppercase tracking-wider text-red-500">Questions Multi-Array Tree Injection Mapping</h4>
+                                <button type="button" id="btn-admin-test-append-question-form-node" class="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl px-3 py-1 text-[11px] font-bold transition-colors flex items-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Append Question Node</button>
+                            </div>
+                            
+                            <div id="admin-test-questions-form-nodes-accumulator" class="space-y-4 divide-y divide-gray-100 max-h-48 overflow-y-auto pr-1">
+                                </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-red-gradient text-white font-semibold text-xs py-3.5 rounded-xl shadow-md">Commit Suite Structure Scheme & Publish System Target</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="view-admin-notifications" class="admin-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Realtime Announcement Broadcast System Console Matrix</h2>
+                    <p class="text-xs text-gray-400">Transmit immediate data alerts across global pipelines or isolated target parameters fields</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <form id="admin-notification-broadcast-generation-form" class="glass-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4 h-fit">
+                        <div class="space-y-1">
+                            <label for="notif-broadcast-target-scope" class="text-xs font-semibold text-gray-500 uppercase">Target Channel Scope Filter Mappings</label>
+                            <select id="notif-broadcast-target-scope" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500">
+                                <option value="global">Global Infrastructure Broad Scope</option>
+                                <option value="9th">9th Class Target Vector Node</option>
+                                <option value="10th">10th Class Target Vector Node</option>
+                                <option value="11th">11th Class Target Vector Node</option>
+                                <option value="12th">12th Class Target Vector Node</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label for="notif-broadcast-message-string" class="text-xs font-semibold text-gray-500 uppercase">Announcement Text String Content</label>
+                            <textarea id="notif-broadcast-message-string" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs outline-none focus:border-red-500 h-24 resize-none" placeholder="Type notification context string package body contents..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-red-gradient text-white font-semibold text-xs py-3 rounded-xl shadow-sm">Transmit Low Latency Broadcast Vector</button>
+                    </form>
+
+                    <div class="lg:col-span-2 glass-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
+                        <h3 class="font-bold text-sm text-gray-700 flex items-center gap-2"><i data-lucide="history" class="w-4 h-4 text-red-500"></i> Historical Systems Broadcast Engine Logs</h3>
+                        <div id="admin-notifications-history-stream-target" class="divide-y divide-gray-50 text-xs text-gray-500 max-h-96 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-admin-support" class="admin-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Bidirectional Infrastructure Ticket Registry</h2>
+                    <p class="text-xs text-gray-400">Perform customer support pipelines triage: manipulate status fields parameters, execute absolute real-time streaming operations replies</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
+                    <div class="glass-card bg-white border border-gray-200 rounded-2xl p-4 flex flex-col shadow-sm">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-gray-500 mb-3 pl-1">Active Operations Stream Logs</h3>
+                        <div id="admin-support-tickets-manifest-scroller" class="flex-grow overflow-y-auto space-y-2"></div>
+                    </div>
+
+                    <div class="lg:col-span-2 glass-card bg-white border border-gray-200 rounded-2xl flex flex-col overflow-hidden shadow-sm relative">
+                        <div id="admin-support-active-chat-header" class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                            <div>
+                                <h4 id="admin-support-header-title" class="font-bold text-xs text-gray-700">Awaiting vector context activation</h4>
+                                <p id="admin-support-header-subtitle" class="text-[10px] text-gray-400 font-mono">No Ticket Connected</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <select id="admin-support-ticket-status-mutation-select" disabled class="bg-white border border-gray-200 rounded-xl px-2 py-1 text-[10px] font-bold outline-none">
+                                    <option value="open">OPEN STATE</option>
+                                    <option value="pending">PENDING TRIAGE</option>
+                                    <option value="closed">RESOLVED CLOSED</option>
+                                </select>
+                                <button id="btn-admin-support-delete-ticket" disabled class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <div id="admin-support-chat-messages-viewport" class="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-50/50"></div>
+
+                        <form id="admin-support-message-dispatch-form" class="p-3 border-t border-gray-100 bg-white flex items-center gap-3">
+                            <input type="text" id="admin-support-input-text-message" disabled required class="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-xs outline-none focus:border-red-400 transition-colors" placeholder="Type secure authoritative administrative reply vector text...">
+                            <button type="submit" id="btn-admin-support-send-message" disabled class="p-3 bg-red-gradient text-white rounded-xl shadow-md flex items-center justify-center transition-opacity"><i data-lucide="arrow-up" class="w-4 h-4"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-admin-community" class="admin-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Community Forum Content Moderation Engine</h2>
+                    <p class="text-xs text-gray-400">Perform direct destructive parsing operations across rows: scrub toxic statements, delete replies, restrict profile privileges</p>
+                </div>
+                <div id="admin-community-moderation-feed-stream" class="space-y-6"></div>
+            </section>
+
+        </main>
+
+        <footer class="h-14 border-t border-gray-100 bg-white/30 backdrop-blur-sm px-6 flex items-center justify-between text-[10px] text-gray-400">
+            <span>Enterprise Root Management Shell Console Layer System Connected Securely</span>
+            <span>Pipeline Session Node (Active v2.6)</span>
+        </footer>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        // Synchronously verify visual file choice on component input element lifecycle
+        document.getElementById('content-upload-file-binary-input').addEventListener('change', (e) => {
+            const label = document.getElementById('admin-content-upload-file-label');
+            if (e.target.files.length > 0) {
+                label.textContent = `Selected Object Asset: ${e.target.files[0].name}`;
+                label.classList.remove('text-gray-400');
+                label.classList.add('text-red-600', 'font-bold');
+            }
+        });
+        lucide.createIcons();
+    </script>
+</body>
+</html>
