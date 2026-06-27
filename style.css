@@ -1,0 +1,185 @@
+/* ==========================================================================
+   1. CORE INFRASTRUCTURE & APPLE TYPOGRAPHY
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700;800&family=SF+Pro+Text:wght@400;500;600&display=swap');
+
+:root {
+    --apple-bg: #f5f5f7;
+    --apple-dark: #1d1d1f;
+    --apple-gray-100: #f2f2f7;
+    --apple-gray-200: #e5e5ea;
+    --apple-gray-400: #8e8e93;
+    --apple-red-gradient: linear-gradient(135deg, #ff453a 0%, #ff2d55 100%);
+    --apple-red-glow: 0 8px 24px rgba(255, 45, 85, 0.25);
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --radius-premium: 24px;
+    --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--apple-bg);
+    color: var(--apple-dark);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .native-sans {
+    font-family: 'SF Pro Display', -apple-system, sans-serif;
+}
+
+/* ==========================================================================
+   2. TAILWIND COMPATIBILITY LAYER & SHAPE ENGINES
+   ========================================================================== */
+.bg-apple-light { background-color: var(--apple-bg); }
+.text-apple-dark { color: var(--apple-dark); }
+.bg-red-gradient { background: var(--apple-red-gradient); }
+.drop-shadow-red { filter: drop-shadow(0 4px 12px rgba(255, 45, 85, 0.3)); }
+.shadow-btn { box-shadow: var(--apple-red-glow); }
+.back-blur-md { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+.fixed { position: fixed; }
+.absolute { position: absolute; }
+.relative { position: relative; }
+.top-0 { top: 0; } .left-0 { left: 0; } .right-0 { right: 0; } .bottom-0 { bottom: 0; }
+.z-30 { z-index: 30; } .z-40 { z-index: 40; } .z-50 { z-index: 50; }
+.w-full { width: 100%; } .h-screen { height: 100vh; }
+.flex { display: flex; } .grid { display: grid; }
+.items-center { align-items: center; } .justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; } .justify-end { justify-content: flex-end; }
+.flex-col { flex-direction: column; } .flex-grow { flex-grow: 1; }
+.gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } .gap-4 { gap: 1rem; } .gap-6 { gap: 1.5rem; }
+
+/* Grid Implementations */
+@media (min-width: 640px) { .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 768px) { .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* Paddings & Spacings */
+.p-2 { padding: 0.5rem; } .p-3 { padding: 0.75rem; } .p-4 { padding: 1rem; } .p-5 { padding: 1.25rem; } .p-6 { padding: 1.5rem; } .p-8 { padding: 2rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; } .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; } .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; } .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; } .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+.pt-32 { padding-top: 8rem; } .mb-4 { margin-bottom: 1rem; } .mb-6 { margin-bottom: 1.5rem; } .mb-12 { margin-bottom: 3rem; }
+
+/* ==========================================================================
+   3. APPLE GLASSMORPHISM UI COMPONENTS
+   ========================================================================== */
+.glass-nav {
+    background: rgba(255, 255, 255, 0.7);
+    height: 72px;
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: var(--radius-premium);
+    transition: var(--transition-smooth);
+}
+
+.glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Base Interactive Layout Navigation Links */
+.nav-link {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--apple-gray-400);
+    text-align: left;
+    transition: var(--transition-smooth);
+}
+
+.nav-link:hover {
+    color: var(--apple-dark);
+    background: rgba(255, 255, 255, 0.5);
+    transform: translateX(4px);
+}
+
+.active-nav {
+    color: #ff2d55 !important;
+    background: rgba(255, 45, 85, 0.08) !important;
+    font-weight: 600;
+}
+
+/* Custom Interactive Toast Engine Layout */
+.toast-portal-fixed {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.toast-message-node {
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.9);
+    border-left: 4px solid #ff2d55;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 14px;
+    padding: 16px 20px;
+    min-w: 280px;
+    max-w: 360px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: toast-arrival 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ==========================================================================
+   4. ANIMATION PARADIGMS & TIMINGS
+   ========================================================================== */
+@keyframes toast-arrival {
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+    animation: view-fade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes view-fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.skeleton-pulse-element {
+    background: linear-gradient(90deg, #e5e5ea 25%, #f2f2f7 50%, #e5e5ea 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shift 1.5s infinite linear;
+}
+
+@keyframes skeleton-shift {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Glow Background Effects */
+.radial-glow-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255,45,87,0.06) 0%, rgba(255,255,255,0) 70%);
+    top: -10%; left: -10%;
+}
+.radial-glow-2 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,69,58,0.05) 0%, rgba(255,255,255,0) 70%);
+    bottom: -10%; right: -10%;
+}
