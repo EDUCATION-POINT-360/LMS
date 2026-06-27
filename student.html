@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Control Dashboard — Education Point</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+</head>
+<body class="bg-apple-light text-apple-dark native-sans antialiased overflow-x-hidden flex">
+
+    <div id="student-toast-system" class="toast-portal-fixed"></div>
+
+    <aside class="w-64 fixed h-screen left-0 top-0 border-r border-gray-200/60 bg-white/80 backdrop-blur-xl flex flex-col justify-between z-40 p-4 transition-transform transform -translate-x-full md:translate-x-0" id="sidebar-node">
+        <div class="space-y-6">
+            <div class="flex items-center gap-3 px-2 py-3 border-b border-gray-100">
+                <div class="bg-red-gradient rounded-xl p-2 flex items-center justify-center">
+                    <i data-lucide="graduation-cap" class="text-white width-20 height-20"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-sm tracking-tight text-gray-800 leading-none">Education Point</h2>
+                    <span id="meta-rendered-class" class="text-[10px] font-bold text-red-500 uppercase tracking-widest block mt-1">Student Area</span>
+                </div>
+            </div>
+
+            <nav id="sidebar-navigation-links" class="space-y-1">
+                <button data-target="dashboard" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all active-nav"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</button>
+                <button data-target="notes" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="book-open" class="w-5 h-5"></i> Lecture Notes</button>
+                <button data-target="guesspapers" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="file-check" class="w-5 h-5"></i> Guess Papers</button>
+                <button data-target="pastpapers" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="history" class="w-5 h-5"></i> Past Papers</button>
+                <button data-target="schemes" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="git-merge" class="w-5 h-5"></i> Pairing Schemes</button>
+                <button data-target="prepmaterials" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="layers" class="w-5 h-5"></i> Prep Material</button>
+                <button data-target="tests" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="shield-alert" class="w-5 h-5"></i> Test Engine Matrix</button>
+                <button data-target="community" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="messages-square" class="w-5 h-5"></i> Community Hub</button>
+                <button data-target="support" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="help-circle" class="w-5 h-5"></i> Support Console</button>
+                <button data-target="downloadcenter" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="download-cloud" class="w-5 h-5"></i> Download Center</button>
+                <button data-target="profile" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-500 hover:bg-white/50"><i data-lucide="user-cog" class="w-5 h-5"></i> Profile Configuration</button>
+            </nav>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100 flex flex-col gap-2">
+            <div class="flex items-center gap-3 px-2 py-1.5">
+                <img id="global-session-avatar" src="placeholder-avatar.jpg" alt="Profile" class="w-9 h-9 rounded-xl object-cover border border-gray-200">
+                <div class="overflow-hidden">
+                    <h4 id="global-session-name" class="font-semibold text-xs text-gray-800 truncate">Student Identity</h4>
+                    <p id="global-session-username" class="text-[10px] text-gray-400 truncate">@username</p>
+                </div>
+            </div>
+            <button id="btn-global-logout" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-colors"><i data-lucide="log-out" class="w-4 h-4"></i> Invalidate Session</button>
+        </div>
+    </aside>
+
+    <div class="flex-grow md:ml-64 min-h-screen flex flex-col justify-between overflow-x-hidden">
+        
+        <header class="h-20 border-b border-gray-200/60 bg-white/40 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="p-2 rounded-xl hover:bg-gray-100 md:hidden transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6 text-gray-600"></i>
+                </button>
+                <div class="relative w-72 md:w-96">
+                    <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="global-system-search-input" class="w-full bg-white/70 border border-gray-200 focus:border-red-500 rounded-2xl pl-11 pr-4 py-2.5 text-xs outline-none transition-all" placeholder="Global structural resource query search...">
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <button id="notif-center-toggle" class="p-2.5 rounded-xl bg-white border border-gray-200/80 text-gray-600 hover:bg-gray-50 transition-all relative">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                        <span id="notif-badge-indicator" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                    </button>
+                    <div id="notif-dropdown-node" class="absolute right-0 mt-3 w-80 bg-white rounded-2xl border border-gray-200 shadow-xl hidden overflow-hidden z-50">
+                        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                            <h4 class="font-bold text-xs uppercase tracking-wide text-gray-700">Realtime Notifications</h4>
+                            <span class="text-[10px] bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-full" id="notif-count-badge">0 New</span>
+                        </div>
+                        <div id="notif-items-target" class="divide-y divide-gray-50 max-h-64 overflow-y-auto text-xs text-gray-500">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="text-right hidden sm:block">
+                    <span id="header-render-institution" class="text-xs font-bold block text-gray-800 leading-none">Global Institution</span>
+                    <span id="header-render-city" class="text-[10px] text-gray-400 font-medium">Node Location</span>
+                </div>
+            </div>
+        </header>
+
+        <main id="app-view-router-target" class="p-6 flex-grow relative">
+            
+            <section id="view-dashboard" class="app-view space-y-8 animate-fade-in">
+                <div id="dashboard-skeleton-wrapper" class="hidden space-y-6">
+                    <div class="w-full h-44 rounded-3xl skeleton-pulse-element"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="h-32 rounded-2xl skeleton-pulse-element"></div>
+                        <div class="h-32 rounded-2xl skeleton-pulse-element"></div>
+                        <div class="h-32 rounded-2xl skeleton-pulse-element"></div>
+                    </div>
+                </div>
+
+                <div id="dashboard-actual-content-node" class="space-y-8">
+                    <div class="bg-red-gradient rounded-3xl p-8 text-white flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden shadow-xl shadow-red-100">
+                        <div class="space-y-2 z-10">
+                            <h2 class="text-3xl font-bold tracking-tight">Assumed Identity Node initialized, <span id="dash-welcome-name">Student</span>!</h2>
+                            <p class="text-white-80 text-sm max-w-xl font-light">Your class context parameters filter historical nodes, schemes, and verification layers smoothly.</p>
+                        </div>
+                        <div class="mt-4 md:mt-0 bg-white-20 backdrop-blur-md px-5 py-3 rounded-2xl border border-white-20 text-left z-10">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white/70 block">Academic Parameter</span>
+                            <span id="dash-welcome-class" class="text-xl font-bold">Class Context</span>
+                        </div>
+                        <div class="absolute -right-10 -bottom-10 opacity-10"><i data-lucide="graduation-cap" class="w-64 h-64"></i></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="glass-card bg-white p-5 border border-gray-200/70 rounded-2xl flex items-center gap-4 shadow-sm">
+                            <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center"><i data-lucide="book-open" class="w-6 h-6"></i></div>
+                            <div><span class="text-xs text-gray-400 block font-medium">Notes Available</span><h3 class="text-xl font-bold" id="metric-student-notes">0</h3></div>
+                        </div>
+                        <div class="glass-card bg-white p-5 border border-gray-200/70 rounded-2xl flex items-center gap-4 shadow-sm">
+                            <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center"><i data-lucide="file-text" class="w-6 h-6"></i></div>
+                            <div><span class="text-xs text-gray-400 block font-medium">Guess Papers</span><h3 class="text-xl font-bold" id="metric-student-guess">0</h3></div>
+                        </div>
+                        <div class="glass-card bg-white p-5 border border-gray-200/70 rounded-2xl flex items-center gap-4 shadow-sm">
+                            <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center"><i data-lucide="activity" class="w-6 h-6"></i></div>
+                            <div><span class="text-xs text-gray-400 block font-medium">Tests Evaluated</span><h3 class="text-xl font-bold" id="metric-student-tests">0</h3></div>
+                        </div>
+                        <div class="glass-card bg-white p-5 border border-gray-200/70 rounded-2xl flex items-center gap-4 shadow-sm">
+                            <div class="w-12 h-12 bg-green-50 text-green-500 rounded-xl flex items-center justify-center"><i data-lucide="download" class="w-6 h-6"></i></div>
+                            <div><span class="text-xs text-gray-400 block font-medium">Total Downloads</span><h3 class="text-xl font-bold" id="metric-student-downloads">0</h3></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 glass-card bg-white border border-gray-200/70 rounded-3xl p-6 shadow-sm space-y-4">
+                            <h3 class="font-bold text-base tracking-tight text-gray-800 flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5 text-red-500"></i> Critical Recent System Activity</h3>
+                            <div id="dashboard-recent-activity-stream" class="divide-y divide-gray-100 text-xs text-gray-500">
+                                </div>
+                        </div>
+                        <div class="glass-card bg-white border border-gray-200/70 rounded-3xl p-6 shadow-sm space-y-4 flex flex-col justify-between">
+                            <h3 class="font-bold text-base tracking-tight text-gray-800 flex items-center gap-2"><i data-lucide="trending-up" class="w-5 h-5 text-red-500"></i> Metrics Analysis Matrix</h3>
+                            <div class="relative flex-grow flex items-center justify-center h-48">
+                                <canvas id="studentDashboardPerformanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-notes" class="app-view space-y-6 hidden animate-fade-in">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight">Academic Lecture Notes Matrix</h2>
+                        <p class="text-xs text-gray-400">Filtered automatically targeting individual registered class constraint</p>
+                    </div>
+                    <input type="text" id="notes-view-search" class="bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs w-full sm:w-64 outline-none" placeholder="Filter current view notes...">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="notes-cards-container-target">
+                    </div>
+            </section>
+
+            <section id="view-guesspapers" class="app-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Verified Board Guess Papers Matrix</h2>
+                    <p class="text-xs text-gray-400">Strategic updates directly provided using low latency execution layers</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="guesspapers-cards-container-target"></div>
+            </section>
+
+            <section id="view-pastpapers" class="app-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Historical Past Papers & Verified Solutions</h2>
+                    <p class="text-xs text-gray-400">Complete analysis across year arrays and board targets</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="pastpapers-cards-container-target"></div>
+            </section>
+
+            <section id="view-schemes" class="app-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Structured Layout Board Pairing Schemes</h2>
+                    <p class="text-xs text-gray-400">Current structural maps indicating absolute distribution parameters</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="schemes-cards-container-target"></div>
+            </section>
+
+            <section id="view-prepmaterials" class="app-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Preparation Resources Repository</h2>
+                    <p class="text-xs text-gray-400">Short notes, highly important conceptual question vectors, and tips</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="prepmaterials-cards-container-target"></div>
+            </section>
+
+            <section id="view-tests" class="app-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Automated MCQ Test Engines</h2>
+                    <p class="text-xs text-gray-400">Configured timer routines, immediate feedback vectors, and score registration</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="tests-cards-container-target"></div>
+                
+                <div id="test-execution-active-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-md items-center justify-center z-50 p-4 hidden flex">
+                    <div class="bg-white rounded-3xl w-full max-w-2xl p-6 shadow-2xl border border-gray-100 flex flex-col max-h-[90vh]">
+                        <div class="border-b border-gray-100 pb-4 flex justify-between items-center">
+                            <div>
+                                <h3 id="active-test-title" class="font-bold text-lg text-gray-800">Test Node Active Session</h3>
+                                <span id="active-test-timer" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-full mt-1 inline-block">Time Remaining: --:--</span>
+                            </div>
+                        </div>
+                        <div id="active-test-questions-scroller" class="flex-grow overflow-y-auto py-6 space-y-6">
+                            </div>
+                        <div class="border-t border-gray-100 pt-4 flex justify-end gap-3">
+                            <button id="btn-active-test-submit" class="bg-red-gradient text-white font-semibold text-xs px-6 py-3 rounded-xl shadow-md">Complete & Transmit Session Data</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-community" class="app-view space-y-6 hidden animate-fade-in">
+                <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight">Class Collaboration Forum</h2>
+                        <p class="text-xs text-gray-400">Encapsulated localized communication channels matching profile configuration</p>
+                    </div>
+                </div>
+
+                <div class="glass-card bg-white border border-gray-200/80 rounded-2xl p-4 shadow-sm space-y-3">
+                    <textarea id="community-new-post-content" required class="w-full bg-gray-50 border border-gray-100 focus:border-red-400 focus:bg-white rounded-xl p-3 text-xs outline-none transition-all resize-none h-20" placeholder="Broadcast verified concepts or queries to your class framework..."></textarea>
+                    <div class="flex justify-end">
+                        <button id="btn-community-submit-post" class="bg-red-gradient text-white text-xs font-semibold px-5 py-2.5 rounded-xl shadow-sm flex items-center gap-1.5"><i data-lucide="send" class="w-3.5 h-3.5"></i> Publish Post</button>
+                    </div>
+                </div>
+
+                <div id="community-posts-feed-stream" class="space-y-6"></div>
+            </section>
+
+            <section id="view-support" class="app-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Secure Infrastructure Technical Support Console</h2>
+                    <p class="text-xs text-gray-400">Realtime communication node establishing continuous bidirectional streaming securely with system admins</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
+                    <div class="glass-card bg-white border border-gray-200 rounded-2xl p-4 flex flex-col shadow-sm">
+                        <button id="btn-support-trigger-new-ticket" class="w-full bg-red-gradient text-white font-semibold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 mb-4 shadow-sm"><i data-lucide="plus" class="w-4 h-4"></i> Initialize New Support Node</button>
+                        <div id="support-tickets-manifest" class="flex-grow overflow-y-auto space-y-2">
+                            </div>
+                    </div>
+
+                    <div class="lg:col-span-2 glass-card bg-white border border-gray-200 rounded-2xl flex flex-col overflow-hidden shadow-sm relative">
+                        <div id="support-active-chat-header" class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                            <div>
+                                <h4 id="support-header-ticket-subject" class="font-bold text-xs text-gray-700">Select active communications vector</h4>
+                                <p id="support-header-ticket-id" class="text-[10px] text-gray-400 font-mono">No Active Ticket Channel</p>
+                            </div>
+                            <span id="support-header-ticket-status" class="text-[10px] uppercase tracking-wide font-bold hidden px-2 py-0.5 rounded-full"></span>
+                        </div>
+
+                        <div id="support-chat-messages-viewport" class="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-50/50"></div>
+
+                        <form id="support-message-dispatch-form" class="p-3 border-t border-gray-100 bg-white flex items-center gap-3">
+                            <input type="text" id="support-input-text-message" disabled required class="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-xs outline-none focus:border-red-400 transition-colors" placeholder="Type secure text vector reply...">
+                            
+                            <div class="relative">
+                                <button type="button" class="p-3 rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors flex items-center justify-center"><i data-lucide="paperclip" class="w-4 h-4"></i></button>
+                                <input type="file" id="support-input-file-attachment" disabled accept="image/*,application/pdf" class="absolute inset-0 opacity-0 cursor-pointer">
+                            </div>
+
+                            <button type="submit" id="btn-support-send-message" disabled class="p-3 bg-red-gradient text-white rounded-xl shadow-md flex items-center justify-center transition-opacity"><i data-lucide="arrow-up" class="w-4 h-4"></i></button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="support-new-ticket-modal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm items-center justify-center z-50 p-4 hidden flex">
+                    <form id="support-create-ticket-form" class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl border border-gray-100 space-y-4 animate-scale-up">
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <h3 class="font-bold text-sm text-gray-800">Initialize Ticket Node</h3>
+                            <button type="button" id="btn-close-ticket-modal" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        </div>
+                        <div class="space-y-1">
+                            <label for="ticket-modal-subject" class="text-xs font-semibold text-gray-500 uppercase">Issue Description Subject</label>
+                            <input type="text" id="ticket-modal-subject" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-red-500 transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label for="ticket-modal-message" class="text-xs font-semibold text-gray-500 uppercase">Context Detail Core Content</label>
+                            <textarea id="ticket-modal-message" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-red-500 transition-all h-24 resize-none"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-red-gradient text-white font-semibold text-xs py-3.5 rounded-xl shadow-md">Transmit Ticket Node to DB</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="view-downloadcenter" class="app-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Personalized Cloud Resource Tracking Sync</h2>
+                    <p class="text-xs text-gray-400">Offline document references synchronized with local caching engines and personal profile history mapping</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
+                        <h3 class="font-bold text-sm text-gray-700 flex items-center gap-2"><i data-lucide="bookmark" class="w-4 h-4 text-red-500"></i> Localized Profile Resource Bookmarks</h3>
+                        <div id="downloads-bookmarks-container-target" class="space-y-2 text-xs text-gray-500"></div>
+                    </div>
+                    <div class="glass-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
+                        <h3 class="font-bold text-sm text-gray-700 flex items-center gap-2"><i data-lucide="download" class="w-4 h-4 text-red-500"></i> Document Download Logs Registry</h3>
+                        <div id="downloads-registry-container-target" class="space-y-2 text-xs text-gray-500"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-profile" class="app-view space-y-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Profile Engine Settings</h2>
+                    <p class="text-xs text-gray-400">Mutate local application parameters sync targets verified inside relational tables</p>
+                </div>
+                
+                <form id="profile-update-form" class="glass-card bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 border-b border-gray-100 pb-4">
+                            <div class="relative group">
+                                <img id="profile-edit-avatar-preview" src="placeholder-avatar.jpg" alt="Preview Avatar" class="w-20 h-20 rounded-2xl object-cover border border-gray-200">
+                                <div class="absolute inset-0 bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer text-white text-[10px] font-bold">Change</div>
+                                <input type="file" id="profile-edit-avatar-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-gray-800">Identity Media Layer</h4>
+                                <p class="text-[10px] text-gray-400">Stored in public isolated user storage bucket objects safely</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label for="profile-edit-name" class="text-xs font-semibold text-gray-500 uppercase">Full Identity Display Name</label>
+                            <input type="text" id="profile-edit-name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-red-500 transition-all">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label for="profile-edit-phone" class="text-xs font-semibold text-gray-500 uppercase">Phone Communications Endpoint</label>
+                            <input type="tel" id="profile-edit-phone" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-red-500 transition-all">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="space-y-1">
+                                <label for="profile-edit-city" class="text-xs font-semibold text-gray-500 uppercase">City Boundary Parameters</label>
+                                <input type="text" id="profile-edit-city" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-red-500 transition-all">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="profile-edit-school" class="text-xs font-semibold text-gray-500 uppercase">School Structure Mapping</label>
+                                <input type="text" id="profile-edit-school" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-red-500 transition-all">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label for="profile-edit-bio" class="text-xs font-semibold text-gray-500 uppercase">Metadata Bio Character String</label>
+                                <textarea id="profile-edit-bio" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-red-500 transition-all h-20 resize-none" placeholder="Update operational info context profile details..."></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-red-gradient text-white font-semibold text-xs py-3.5 rounded-xl shadow-md mt-4">Commit Vector Updates to Profiles</button>
+                    </div>
+                </form>
+            </section>
+
+            <div id="pdf-viewer-overlay-portal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-md items-center justify-center z-50 p-4 hidden flex">
+                <div class="bg-white rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-100">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <div>
+                            <h3 id="pdf-portal-title-render" class="font-bold text-sm text-gray-800 truncate max-w-md">Secure PDF Engine Renderer Panel</h3>
+                            <p id="pdf-portal-meta-render" class="text-[10px] text-gray-400">PDF.js Cloud Streaming Core Integration Matrix</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-200 text-xs text-gray-600">
+                                <button id="btn-pdf-prev-page" class="hover:text-red-500"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <span id="pdf-page-num-indicator">Page 1 of 1</span>
+                                <button id="btn-pdf-next-page" class="hover:text-red-500"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                            <button id="btn-pdf-close-portal" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        </div>
+                    </div>
+                    <div class="flex-grow overflow-auto p-6 bg-gray-100 flex justify-center items-start">
+                        <canvas id="pdf-render-main-canvas-node" class="shadow-md bg-white"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="h-14 border-t border-gray-100 bg-white/30 backdrop-blur-sm px-6 flex items-center justify-between text-[10px] text-gray-400">
+            <span>Framework State Engine Connected Suite (v2.6)</span>
+            <span>Realtime Pipeline Enabled Secure Node</span>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
