@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Node Provisioning — Education Point</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-apple-light text-apple-dark native-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <header class="p-6 w-full max-w-7xl mx-auto flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2">
+            <div class="bg-red-gradient rounded-xl p-2 flex items-center justify-center">
+                <i data-lucide="graduation-cap" class="text-white width-20 height-20"></i>
+            </div>
+            <span class="font-bold text-lg tracking-tight text-gray-800">Education Point</span>
+        </a>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center px-4 py-12 relative">
+        <div class="absolute radial-glow-2 -z-10"></div>
+
+        <div class="glass-card w-full max-w-3xl border border-white-60 bg-white-40 backdrop-blur-xl rounded-3xl p-8 md:p-10 shadow-2xl relative">
+            <div id="auth-toast-container" class="absolute -top-16 left-0 right-0 flex justify-center pointer-events-none transition-all duration-300 transform translate-y-4 opacity-0"></div>
+
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold tracking-tight mb-2">Create Student Account</h2>
+                <p class="text-sm text-gray-400">Initialize identity configuration metadata profile mapped directly via Supabase Auth</p>
+            </div>
+
+            <form id="register-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-red-500 border-b border-gray-100 pb-1">Core Identity</h3>
+                    
+                    <div class="input-group flex flex-col space-y-1">
+                        <label for="reg-fullname" class="text-xs font-medium text-gray-400">Full Name</label>
+                        <input type="text" id="reg-fullname" required class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all">
+                    </div>
+
+                    <div class="input-group flex flex-col space-y-1">
+                        <label for="reg-username" class="text-xs font-medium text-gray-400">Username</label>
+                        <input type="text" id="reg-username" required class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all">
+                    </div>
+
+                    <div class="input-group flex flex-col space-y-1">
+                        <label for="reg-email" class="text-xs font-medium text-gray-400">Email Address</label>
+                        <input type="email" id="reg-email" required class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all">
+                    </div>
+
+                    <div class="input-group flex flex-col space-y-1">
+                        <label for="reg-password" class="text-xs font-medium text-gray-400">Password</label>
+                        <input type="password" id="reg-password" required class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all" placeholder="Minimum 6 characters">
+                    </div>
+
+                    <div class="input-group flex flex-col space-y-1">
+                        <label for="reg-phone" class="text-xs font-medium text-gray-400">Phone Number</label>
+                        <input type="tel" id="reg-phone" required class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all" placeholder="e.g., +923001234567">
+                    </div>
+
+                    <div class="input-group flex flex-col space-y-1">
+                        <label for="reg-gender" class="text-xs font-medium text-gray-400">Gender Identity</label>
+                        <select id="reg-gender" class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-red-500 border-b border-gray-100 pb-1">Academic Mapping</h3>
+                        
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="input-group flex flex-col space-y-1">
+                                <label for="reg-class" class="text-xs font-medium text-gray-400">Target Class</label>
+                                <select id="reg-class" class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all">
+                                    <option value="9th">9th Grade</option>
+                                    <option value="10th">10th Grade</option>
+                                    <option value="11th">11th Grade</option>
+                                    <option value="12th">12th Grade</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group flex flex-col space-y-1">
+                                <label for="reg-board" class="text-xs font-medium text-gray-400">Education Board</label>
+                                <input type="text" id="reg-board" required class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all" placeholder="e.g., Lahore Board">
+                            </div>
+                        </div>
+
+                        <div class="input-group flex flex-col space-y-1 mt-4">
+                            <label for="reg-school" class="text-xs font-medium text-gray-400">Institution (School / College)</label>
+                            <input type="text" id="reg-school" required class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all">
+                        </div>
+
+                        <div class="input-group flex flex-col space-y-1 mt-4">
+                            <label for="reg-city" class="text-xs font-medium text-gray-400">City</label>
+                            <input type="text" id="reg-city" required class="w-full bg-white/60 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-500 outline-none transition-all">
+                        </div>
+
+                        <div class="input-group flex flex-col space-y-1 mt-4">
+                            <label class="text-xs font-medium text-gray-400">Profile Picture Setup</label>
+                            <div class="relative w-full border-2 border-dashed border-gray-200/80 rounded-2xl p-4 text-center hover:border-red-400 transition-colors bg-white/30 flex flex-col items-center justify-center">
+                                <i data-lucide="camera" class="text-gray-400 width-24 height-24 mb-1"></i>
+                                <span class="text-xs text-gray-400" id="avatar-file-name-display">Upload Profile Image (PNG/JPG)</span>
+                                <input type="file" id="reg-avatar" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-register-submit" class="w-full bg-red-gradient text-white py-4 rounded-2xl font-semibold shadow-lg shadow-red-200 transition-all hover:opacity-95 flex items-center justify-center gap-2 mt-6">
+                        <span>Initialize Node Registration</span>
+                        <i data-lucide="user-plus" class="width-18 height-18"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-8 text-center border-t border-gray-100 pt-6">
+                <p class="text-sm text-gray-400">
+                    Already registered within this infrastructure? 
+                    <a href="login.html" class="text-red-500 font-semibold hover:underline ml-1">Authenticate Identity Here</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="p-6 text-center text-xs text-gray-400">
+        Registration protocols perform explicit transactional structural initialization.
+    </footer>
+
+    <script src="auth.js"></script>
+    <script>
+        // Track visual feedback for file system selection inside HTML UI execution safely
+        document.getElementById('reg-avatar').addEventListener('change', (e) => {
+            const label = document.getElementById('avatar-file-name-display');
+            if (e.target.files.length > 0) {
+                label.textContent = `Selected: ${e.target.files[0].name}`;
+                label.classList.remove('text-gray-400');
+                label.classList.add('text-red-600', 'font-medium');
+            }
+        });
+        lucide.createIcons();
+    </script>
+</body>
+</html>
