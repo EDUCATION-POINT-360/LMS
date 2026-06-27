@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Access Gateway — Education Point</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-apple-light text-apple-dark native-sans flex flex-col min-h-screen justify-between antialiased">
+
+    <header class="p-6 w-full max-w-7xl mx-auto flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2 group">
+            <div class="bg-red-gradient rounded-xl p-2 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <i data-lucide="graduation-cap" class="text-white width-20 height-20"></i>
+            </div>
+            <span class="font-bold text-lg tracking-tight text-gray-800">Education Point</span>
+        </a>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center px-4 py-12 relative">
+        <div class="absolute radial-glow-1 -z-10"></div>
+        
+        <div class="glass-card w-full max-w-md border border-white-60 bg-white-40 backdrop-blur-xl rounded-3xl p-8 shadow-2xl relative transition-all">
+            <div id="auth-toast-container" class="absolute -top-16 left-0 right-0 flex justify-center pointer-events-none transition-all duration-300 transform translate-y-4 opacity-0"></div>
+
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold tracking-tight mb-2">Welcome Back</h2>
+                <p class="text-sm text-gray-400">Enter database authentication credentials to access your academic node</p>
+            </div>
+
+            <form id="login-form" class="space-y-5">
+                <div class="input-group flex flex-col space-y-1.5">
+                    <label for="login-email" class="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-1">Email Address</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 width-18 height-18"></i>
+                        <input type="email" id="login-email" required class="w-full bg-white/60 border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 rounded-2xl pl-12 pr-4 py-3.5 text-sm transition-all outline-none" placeholder="name@domain.com">
+                    </div>
+                </div>
+
+                <div class="input-group flex flex-col space-y-1.5">
+                    <div class="flex justify-between items-center px-1">
+                        <label for="login-password" class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Password</label>
+                    </div>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 width-18 height-18"></i>
+                        <input type="password" id="login-password" required class="w-full bg-white/60 border border-gray-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 rounded-2xl pl-12 pr-4 py-3.5 text-sm transition-all outline-none" placeholder="••••••••••••">
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-login-submit" class="w-full bg-red-gradient text-white py-4 rounded-2xl font-semibold shadow-lg shadow-red-200 transition-all hover:opacity-95 flex items-center justify-center gap-2 mt-4">
+                    <span>Authenticate Session</span>
+                    <i data-lucide="log-in" class="width-18 height-18"></i>
+                </button>
+            </form>
+
+            <div class="mt-8 text-center border-t border-gray-100 pt-6">
+                <p class="text-sm text-gray-400">
+                    New academic node candidate? 
+                    <a href="register.html" class="text-red-500 font-semibold hover:underline ml-1">Establish Student Account</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="p-6 text-center text-xs text-gray-400">
+        Secure Supabase Authentication Gateway. System Activity Monitored.
+    </footer>
+
+    <script src="auth.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
